@@ -70,6 +70,7 @@ async function initCalendar() {
         updateNext(); 
         setupMonthSelect(); 
         render(currentMonthIdx);
+        updateActivityChart();
     } catch(e) { 
         console.error("Hiba az adatok betöltésekor", e); 
     }
@@ -119,7 +120,6 @@ function updateNext() {
             <span style="font-weight:bold; color:var(--hfs-red)">
                 ${diff <= 0 ? "MA KEZDŐDIK! 🔥" : "Még " + diff + " nap"}
             </span>
-            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
             <div id="weatherForecast" style="display: flex; flex-direction: column; gap: 8px;">
                 <p style="font-size:0.8em; opacity:0.6;">Időjárás betöltése...</p>
             </div>
@@ -294,4 +294,49 @@ document.addEventListener('DOMContentLoaded', () => {
     initCalendar();
 });
 
+/**
+ * Kiszámolja és kirajzolja a tagok aktivitási diagramját.
+ */
+function updateActivityChart() {
+    const chartContainer = document.getElementById('activityChart');
+    if (!chartContainer || allEvents.length === 0) return;
 
+    const stats = {};
+    Object.keys(resztvevokMap).forEach(name => stats[name] = 0);
+    const totalPossibleEvents = allEvents.length;
+
+    // Statisztika gyűjtése
+    allEvents.forEach(e => {
+        Object.keys(resztvevokMap).forEach(name => {
+            const s = (e[name] || "").toLowerCase();
+            if (["igen", "fizetve", "igazolt"].some(vs => s.includes(vs))) {
+                stats[name]++;
+            }
+        });
+    });
+
+    chartContainer.innerHTML = '';
+
+    // Segédfüggvény egy oszlop létrehozásához
+    const createColumn = (val, emoji, count, isTotal = false) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'chart-column-wrapper';
+        // A magasságot az összes eseményhez viszonyítjuk (max 100px)
+        const height = (count / totalPossibleEvents) * 100;
+        
+        wrapper.innerHTML = `
+            <span class="chart-label">${count}</span>
+            <div class="chart-bar" style="height: ${height}px; opacity: ${isTotal ? '0.5' : '1'}"></div>
+            <span class="chart-emoji">${emoji}</span>
+        `;
+        return wrapper;
+    };
+
+    // 1. oszlop: Összes event
+    chartContainer.appendChild(createColumn(totalPossibleEvents, "📅", totalPossibleEvents, true));
+
+    // 2-6. oszlop: Tagok
+    Object.keys(resztvevokMap).forEach(name => {
+        chartContainer.appendChild(createColumn(stats[name], resztvevokMap[name], stats[name]));
+    });
+}
