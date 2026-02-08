@@ -17,7 +17,7 @@ body, html {
     align-items: center;
     padding: 0 16px;
     border-bottom: 1px solid var(--border-color);
-    z-index: 1000;
+    z-index: 1200;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
@@ -70,30 +70,37 @@ body, html {
 }
 
 .sidebar-card {
-    background: var(--bg-color); /* Enyhén elüt a sidebar hátterétől */
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 14px;
+    background: #fdfdfd; /* Nagyon világos szürke/fehér háttér */
+    border: 1px solid #e0e0e0;
+    border-radius: 16px; /* Nagyobb kerekítés a modernebb megjelenésért */
+    padding: 18px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Lágy árnyék a kiemeléshez */
+    margin-bottom: 4px;
+    transition: transform 0.2s ease;
 }
 
 .sidebar-card h3 {
-    margin: 0 0 10px 0;
-    font-size: 0.85em;
-    color: var(--hfs-red);
+    margin: 0 0 12px 0;
+    font-size: 0.9em;
+    color: #800000; /* HFS Red */
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 8px;
 }
 
 /* --- AKTIVITÁS DIAGRAM (LEFELÉ LÓGÓ) --- */
 .activity-chart-container {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* Fentről indulnak az oszlopok */
-    height: 120px;
+    align-items: flex-start;
+    height: 130px;
     padding: 10px 5px;
-    border-top: 2px solid var(--hfs-red); /* Ez a "tengely" */
-    background: rgba(0,0,0,0.02);
-    border-radius: 0 0 8px 8px;
+    margin-top: 5px;
+    border-top: 2px solid #800000;
+    background: #f9f9f9;
+    border-radius: 0 0 12px 12px; /* Illeszkedik a kártya kerekítéséhez */
 }
 
 .chart-column-wrapper {
@@ -208,7 +215,15 @@ body, html {
 
 /* --- MOBIL NÉZET --- */
 @media (max-width: 1024px) {
-    .fixed-nav { width: 100%; }
+.fixed-nav { 
+        width: 100% !important; /* Fixen kitölti a képernyőt */
+        left: 0;
+        right: 0;
+    }
+
+    .calendar-page .main-layout {
+        padding-top: 50px;
+    }
     
     .sidebar {
         position: fixed;
@@ -218,7 +233,7 @@ body, html {
         width: 280px;
         min-width: 280px;
         transform: translateX(-100%);
-        z-index: 999;
+        z-index: 1100;
         box-shadow: 5px 0 15px rgba(0,0,0,0.1);
     }
     
@@ -232,3 +247,4 @@ body, html {
         overflow-x: auto; /* Mobilon görgethető naptár rács */
     }
 }
+
