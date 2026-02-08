@@ -121,12 +121,39 @@ function updateActivityChart() {
 function updateNext() {
     const box = document.getElementById('nextEventContent');
     if (!box) return;
-    const now = new Date().setHours(0,0,0,0);
-    const upcoming = allEvents.filter(e => e._end.getTime() >= now).sort((a, b) => a._start - b._start)[0];
+    
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    // Megkeressük a legközelebbi jövőbeli eseményt (ami még nem ért véget)
+    const upcoming = allEvents
+        .filter(e => e._end && e._end >= now)
+        .sort((a, b) => a._start - b._start)[0];
+
     if (upcoming) {
-        box.innerHTML = `<strong>${upcoming.Event}</strong><br><small>📅 ${upcoming["Start date"]}</small>`;
+        // Napok kiszámítása
+        const diffTime = upcoming._start - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        let dayText = "";
+        if (diffDays > 0) {
+            dayText = `Még ${diffDays} nap`;
+        } else if (diffDays === 0) {
+            dayText = "Ma kezdődik! 🔥";
+        } else {
+            dayText = "Folyamatban... 🚀";
+        }
+
+        box.innerHTML = `
+            <div class="next-event-wrapper">
+                <div class="next-event-title">${upcoming.Event}</div>
+                <div class="next-event-info">📍 ${upcoming.Location || 'Ismeretlen'}</div>
+                <div class="next-event-info">🗓️ ${upcoming["Start date"]}</div>
+                <div class="next-event-countdown">${dayText}</div>
+            </div>
+        `;
     } else {
-        box.innerHTML = "Nincs következő esemény.";
+        box.innerHTML = "<div class='next-event-info'>Nincs következő esemény.</div>";
     }
 }
 
@@ -190,3 +217,4 @@ document.addEventListener('DOMContentLoaded', () => {
         else sb.classList.toggle('collapsed');
     };
 });
+
