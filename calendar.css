@@ -114,6 +114,13 @@
 	letter-spacing: 2px; margin: 0;
 }
 
+.month-title-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+}
+
 .nav-btn {
 	background: var(--hfs-red);
 	color: white;
@@ -201,25 +208,50 @@
 }
 
 /* Esemény kártyák */
-.event-card { 
-    background-color: var(--event-card-bg); 
-    padding: 8px; 
-    border-radius: 10px; 
-    border: 1px solid var(--event-card-border); 
-    margin-bottom: 8px;
+.event-card {
+	background-color: var(--event-card-bg);
+	padding: 8px;
+	border-radius: 10px;
+	border: 1px solid var(--event-card-border);
+	margin-bottom: 8px;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.person-tag { 
-    background: var(--status-biztos-bg); 
-    padding: 3px 8px; 
-    border-radius: 15px; 
-    font-size: 0.7em; 
-    font-weight: 700; 
-    display: flex; 
-    align-items: center; 
-    gap: 4px;
-    border: 1px solid var(--border-color);
-    border-left: 4px solid #ccc;
+.event-title {
+	font-weight: 800;
+	color: var(--hfs-red);
+	font-size: 0.85em;
+	margin-bottom: 8px;
+	display: block;
+}
+
+.participants-container {
+	display: flex;
+	flex-wrap: wrap; /* Ez teszi egymás mellé a kártyákat */
+	gap: 6px;
+}
+
+.person-tag {
+	background: var(--status-biztos-bg);
+	padding: 4px 8px;
+	border-radius: 15px;
+	font-size: 0.75em;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	border: 1px solid var(--border-color);
+	color: var(--text-color);
+	border-left: 4px solid #ccc;
+	white-space: nowrap; /* Ne törjön ketté a név */
+}
+
+.status-biztos {
+	border-left-color: var(--status-biztos-border);
+}
+
+.status-talan {
+	border-left-color: var(--status-talan-border);
 }
 
 @media (max-width: 768px) {
@@ -235,4 +267,3 @@
 	}
 
 }
-
