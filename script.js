@@ -101,19 +101,17 @@ function renderFilter() {
     });
 }
 
-/**
- * Kiszámolja és megjeleníti a soron következő eseményt a sidebarban.
- */
 function updateNext() {
     const nextBox = document.getElementById('nextEventContent');
     if (!nextBox) return;
 
     const now = new Date().setHours(0,0,0,0);
-    // Csak a jövőbeli események érdekelnek, dátum szerint rendezve
     const next = allEvents.filter(e => e._end && e._end >= now).sort((a,b) => a._start - b._start)[0];
     
     if(next) {
         const diff = Math.ceil((next._start - now) / 86400000);
+        
+        // Tartalom frissítése az időjárás konténerrel együtt
         nextBox.innerHTML = `
             <h2 style="font-size:1.1em; margin:0">${next.Event}</h2>
             <p style="margin:5px 0; font-size:0.9em; opacity:0.8">📍 ${next.Location || 'TBD'}</p>
@@ -121,7 +119,18 @@ function updateNext() {
             <span style="font-weight:bold; color:var(--hfs-red)">
                 ${diff <= 0 ? "MA KEZDŐDIK! 🔥" : "Még " + diff + " nap"}
             </span>
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
+            <div id="weatherForecast" style="display: flex; flex-direction: column; gap: 8px;">
+                <p style="font-size:0.8em; opacity:0.6;">Időjárás betöltése...</p>
+            </div>
         `;
+
+        // Időjárás lekérése a helyszín alapján
+        if (next.Location) {
+            fetchWeather(next.Location);
+        }
+    } else {
+        nextBox.innerHTML = "Nincs következő esemény.";
     }
 }
 
@@ -234,3 +243,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initCalendar();
 });
+
