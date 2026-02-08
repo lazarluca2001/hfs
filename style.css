@@ -16,7 +16,7 @@
     --empty-day-fill: #f9f9f9;
     --empty-dots: #e0e0e0;
     /* Új landing page változók */
-    --overlay: rgba(0, 0, 0, 0.4);
+    --overlay: rgba(0, 0, 0, 0.6);
     --white: #ffffff;
 }
 
@@ -157,6 +157,7 @@ body, html {
     flex: 1;
     display: flex;
     align-items: center;
+    justify-content: flex-end; /* A szöveg maradjon a jobb oldalon */
     padding: 0 10%;
     position: relative;
 }
@@ -190,16 +191,18 @@ body, html {
 
 .side-title {
     position: absolute;
-    right: 5%;
+    right: 8%; /* Kicsit beljebb hoztuk a szélétől */
     top: 50%;
     transform: translateY(-50%);
-    font-size: 8rem;
+    font-size: clamp(4rem, 10vw, 9rem); /* Rugalmas méretezés */
     font-weight: 900;
-    opacity: 0.2;
-    line-height: 0.8;
+    opacity: 0.7; /* Kontrasztosabb (korábban 0.2 volt) */
+    line-height: 0.85;
     text-align: right;
     pointer-events: none;
     color: var(--white);
+    letter-spacing: 15px; /* Több hely a betűk/szavak között */
+    text-transform: uppercase;
 }
 
 /* Sötét mód kapcsoló esztétikája */
@@ -218,3 +221,4 @@ input:checked + .slider:before { transform: translateX(20px); }
     .main-text h1 { font-size: 3rem; }
     .side-title { display: none; }
 }
+
