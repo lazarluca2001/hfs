@@ -209,6 +209,40 @@ input:checked + .slider:before { transform: translateX(20px); }
 .status-biztos { border-left-color: var(--status-biztos-border); }
 .status-talan { border-left-color: var(--status-talan-border); }
 
+/* Következő állomás kártya belső stílusa */
+.next-event-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.next-event-title {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--text-color);
+    line-height: 1.2;
+}
+
+.next-event-info {
+    font-size: 0.9em;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.next-event-countdown {
+    margin-top: 5px;
+    font-weight: 800;
+    color: var(--hfs-red);
+    font-size: 1em;
+}
+
+/* Sötét mód finomítás a visszaszámláláshoz */
+[data-theme="dark"] .next-event-countdown {
+    color: #ff6666;
+}
+
 /* --- MOBIL NÉZET --- */
 @media (max-width: 1024px) {
     .sidebar { position: fixed; top: 50px; left: 0; height: calc(100vh - 50px); z-index: 1000; transform: translateX(-100%); }
@@ -216,5 +250,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     .calendar-grid { grid-template-columns: repeat(7, minmax(130px, 1fr)); }
     .calendar-section { overflow-x: auto; }
 }
+
 
 
