@@ -1,4 +1,25 @@
-	/* --- NAPTÁR OLDAL SPECIFIKUS --- */
+/* --- VÁLTOZÓK ÉS SZÍNEK --- */
+:root { 
+    --hfs-red: #800000;
+    --hfs-light-red: #fff0f0; 
+    --bg-color: #f4f4f4;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --border-color: #dddddd;
+    --white: #ffffff;
+    --overlay: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] {
+    --bg-color: #0a0a0a;
+    --card-bg: #1a1a1a;
+    --text-color: #f0f0f0;
+    --border-color: #333333;
+    --hfs-red: #ff4d4d;
+    --hfs-light-red: #2a1515;
+}
+
+/* --- NAPTÁR OLDAL SPECIFIKUS --- */
 .calendar-page .main-layout { 
     display: flex; 
     height: 100vh; 
@@ -267,3 +288,4 @@
 	}
 
 }
+
