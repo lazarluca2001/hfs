@@ -5,10 +5,10 @@
     left: 0;
     width: 320px; 
     height: 50px;
-    background: var(--bg-color);
-    display: flex;             /* Ez teszi egy sorba az elemeket */
-    justify-content: space-between; /* Ez tolja a két szélre őket */
-    align-items: center;       /* Ez igazítja őket függőlegesen középre */
+    background: var(--card-bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 0 20px;
     box-sizing: border-box;
     border-right: 1px solid var(--border-color);
@@ -47,7 +47,7 @@
 /* --- TAGOK SZŰRÉSE JAVÍTÁSA --- */
 .member-filter {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Két egyenlő oszlop */
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
     width: 100%;
 }
@@ -65,8 +65,8 @@
     justify-content: center;
     gap: 6px;
     cursor: pointer;
-    white-space: nowrap; /* Ne törje meg a nevet */
-    width: 100%;        /* Kitölti a grid cellát */
+    white-space: nowrap;
+    width: 100%;
     box-sizing: border-box;
     transition: all 0.2s;
 }
@@ -85,69 +85,79 @@
     opacity: 0.7;
 }
 
-/* --- DARK MODE SWITCHER IKONOKKAL --- */
+/* --- DARK MODE SWITCHER JAVÍTOTT --- */
 .theme-switch-wrapper {
     display: flex;
     align-items: center;
-    margin-top: 0 !important; /* Felülírja a korábbi alsó elhelyezéshez szánt margót */
+    margin-top: 0 !important;
     padding-top: 0 !important;
 }
-.theme-switch { 
-    position: relative; 
-    display: inline-block; 
-    width: 36px;  /* 50-ről 36-ra csökkentve */
-    height: 18px; /* 25-ről 18-ra csökkentve */
+
+.theme-switch { 
+    position: relative; 
+    display: inline-block; 
+    width: 38px;  /* Picit növelve a stabilitásért */
+    height: 20px; 
 }
+
 .theme-switch input {
     opacity: 0;
     width: 0;
-    height: 0; }
+    height: 0;
+}
 
 .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: var(--card-bg);
-    transition: .4s;
-    border-radius: 20px;
-    /* VÉKONY HFS VÖRÖS BORDER */
-    border: 1px solid var(--hfs-red); 
-    box-sizing: border-box;
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #eee; /* Világos szürke, hogy látszódjon a fehér gomb */
+    transition: .4s;
+    border-radius: 20px;
+    border: 1.5px solid var(--hfs-red); /* Erősebb keret */
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .slider:before {
-    position: absolute;
-    content: "";
-    height: 12px; /* Gomb mérete csökkentve */
-    width: 12px;  
-    left: 2px;
-    bottom: 2px;
-    background-color: var(--hfs-red); /* A gombot is vörösre állíthatod az összhangért */
-    transition: .4s;
-    border-radius: 50%;
-    z-index: 2;
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 2.5px;
+    background-color: var(--hfs-red); /* Piros gomb a jobb láthatóságért */
+    transition: .4s;
+    border-radius: 50%;
+    z-index: 5;
 }
 
-.slider::after { 
-    content: "🌙"; 
-    font-size: 8px; /* Kisebb ikon */
-    position: absolute; 
-    right: 4px; 
-    top: 50%;
-    transform: translateY(-50%);
-    transition: 0.4s;
+/* Ikonok alaphelyzete (Hold) */
+.slider::after { 
+    content: "🌙"; 
+    font-size: 9px;
+    position: absolute; 
+    right: 4px; 
+    top: 50%;
+    transform: translateY(-50%);
+    transition: 0.4s;
+    z-index: 1;
 }
 
 /* Nap ikon sötét módban */
-[data-theme="dark"] .slider::after { 
-    content: "☀️"; 
-    left: 4px;
-    right: auto;
+[data-theme="dark"] .slider::after { 
+    content: "☀️"; 
+    left: 4px;
+    right: auto;
 }
 
-input:checked + .slider { background-color: var(--hfs-light-red); }
+/* Sötét mód aktív állapota */
+input:checked + .slider { 
+    background-color: #333; 
+}
+
 input:checked + .slider:before {
-    transform: translateX(18px);
+    transform: translateX(18px);
+    background-color: #fff; /* Sötétben fehér gomb */
 }
 
 /* --- SIDEBAR KÁRTYÁK --- */
@@ -166,14 +176,14 @@ input:checked + .slider:before {
     letter-spacing: 1px;
 }
 
-/* --- AKTIVITÁS DIAGRAM (LEFELÉ LÓGÓ) --- */
+/* --- AKTIVITÁS DIAGRAM --- */
 .activity-chart-container {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     height: auto;
     padding: 10px 5px;
-    border-top: 2px solid var(--hfs-red); /* Felső tengely */
+    border-top: 2px solid var(--hfs-red);
     background: rgba(0,0,0,0.02);
     border-radius: 0 0 8px 8px;
 }
@@ -243,17 +253,12 @@ input:checked + .slider:before {
 /* --- MOBIL NÉZET --- */
 @media (max-width: 768px) {
     .fixed-nav {
-        width: 100%; /* Mobilon töltse ki a szélességet */
-        position: sticky; /* Ne takarja el a naptárat görgetéskor, ha nem akarod */
+        width: 100%;
+        position: sticky;
     }
     .calendar-page .sidebar {
         width: 100%;
-        padding-top: 20px; /* Mobilon nincs szükség a nagy felső paddingre, ha sticky */
+        padding-top: 20px;
         height: auto;
     }
 }
-
-
-
-
-
