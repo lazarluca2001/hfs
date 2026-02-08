@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HFS European Tour 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="main-layout">
+    <aside class="sidebar">
+        <h1 class="sidebar-logo">HFS 2026</h1>
+        <div class="sidebar-card">
+            <h3>KÖVETKEZŐ ÁLLOMÁS</h3>
+            <div id="nextEventContent" class="text-content">Betöltés...</div>
+        </div>
+        <div class="sidebar-card">
+            <h3>TAGOK SZŰRÉSE</h3>
+            <div id="memberFilter" class="member-filter"></div>
+        </div>
+        <div class="theme-switch-wrapper">
+            <span>Sötét mód</span>
+            <label class="theme-switch">
+                <input type="checkbox" id="checkbox">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </aside>
+
+    <main class="calendar-section">
+        <div class="month-display-container">
+            <div class="month-title-group">
+                <button class="nav-btn" onclick="changeMonth(-1)">❮</button>
+                <h2 id="currentMonthHeader" class="month-display"></h2>
+                <button class="nav-btn" onclick="changeMonth(1)">❯</button>
+            </div>
+            <div class="controls-row">
+                <button class="today-btn" onclick="goToToday()">Ma</button>
+                <select id="monthSelect"></select>
+            </div>
+        </div>
+        <div id="calendar" class="calendar-grid"></div>
+    </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
