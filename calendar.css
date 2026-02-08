@@ -138,7 +138,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* STATISZTIKA (Lefelé lógó) */
 .activity-chart-container {
     display: flex; justify-content: space-around; align-items: flex-start;
-    height: 110px; padding: 15px 5px; background: var(--card-bg);
+    height: auto; padding: 15px 5px; background: var(--card-bg);
     border-top: 2px solid var(--hfs-red); border-radius: 0 0 12px 12px;
 }
 .chart-column-wrapper { display: flex; flex-direction: column; align-items: center; }
@@ -153,7 +153,12 @@ input:checked + .slider:before { transform: translateX(20px); }
     display: flex; flex-direction: column; align-items: center;
     padding: 20px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); gap: 15px;
 }
-
+.month-title-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+}
 .month-display { color: var(--hfs-red); font-size: 2.2em; font-weight: 800; text-transform: uppercase; margin: 0; }
 .nav-btn { background: var(--hfs-red); color: white; border: none; border-radius: 50%; width: 38px; height: 38px; cursor: pointer; }
 
@@ -211,4 +216,5 @@ input:checked + .slider:before { transform: translateX(20px); }
     .calendar-grid { grid-template-columns: repeat(7, minmax(130px, 1fr)); }
     .calendar-section { overflow-x: auto; }
 }
+
 
