@@ -90,7 +90,7 @@
     margin-top: 0 !important; /* Felülírja a korábbi alsó elhelyezéshez szánt margót */
     padding-top: 0 !important;
 }
-.theme-switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+.theme-switch { position: relative; display: inline-block; width: 80px; height: 40px; }
 .theme-switch input { opacity: 0; width: 0; height: 0; }
 
 .slider {
@@ -100,28 +100,39 @@
 }
 
 .slider:before {
-    position: absolute; content: "";
-    height: 14px; width: 14px; left: 3px; bottom: 3px;
-    background-color: white; transition: .4s; border-radius: 50%; z-index: 2;
+    position: absolute;
+    content: "";
+    height: 34px; /* Megnövelt gombméret */
+    width: 34px;  /* Megnövelt gombméret */
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    z-index: 2;
 }
 
 .slider::after { 
     content: "🌙"; 
-    font-size: 10px; 
+    font-size: 18px; /* Nagyobb ikon a nagyobb kapcsolóhoz */
     position: absolute; 
-    right: 6px; 
-    top: 4px; 
+    right: 10px; 
+    top: 50%;
+    transform: translateY(-50%); /* Tökéletes függőleges közép */
     transition: 0.4s;
 }
 
 /* Nap ikon sötét módban */
 [data-theme="dark"] .slider::after { 
     content: "☀️"; 
-    right: 22px; /* Elmozdítjuk, hogy ne takarja a fehér pötty */
+    left: 10px;
+    right: auto;
 }
 
 input:checked + .slider { background-color: #333; }
-input:checked + .slider:before { transform: translateX(20px); }
+input:checked + .slider:before {
+    transform: translateX(40px); /* 80px-nél ez az ideális eltolás */
+}
 
 /* --- SIDEBAR KÁRTYÁK --- */
 .sidebar-card {
@@ -225,4 +236,5 @@ input:checked + .slider:before { transform: translateX(20px); }
         height: auto;
     }
 }
+
 
