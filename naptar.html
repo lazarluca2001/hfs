@@ -7,24 +7,25 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="calendar.css">
 </head>
-
 <body class="calendar-page">
 
-<div class="fixed-nav">
+<nav class="fixed-nav">
     <div class="nav-left">
-        <a href="index.html">❮ FŐOLDAL</a>
+        <a href="index.html" class="back-btn">❮ FŐOLDAL</a>
         <button id="sidebarToggle" class="filter-toggle-btn">🔍 SZŰRŐK</button>
     </div>
-
-    <label class="theme-switch">
-        <input type="checkbox" id="checkbox">
-        <span class="slider"></span>
-    </label>
-</div>
+    <div class="theme-switch-wrapper">
+        <span class="theme-label">Sötét mód</span>
+        <label class="theme-switch">
+            <input type="checkbox" id="checkbox">
+            <span class="slider"></span>
+        </label>
+    </div>
+</nav>
 
 <div class="main-layout">
     <aside class="sidebar">
-        <div class="sidebar-card">
+        <div class="sidebar-card next-event">
             <h3>KÖVETKEZŐ ÁLLOMÁS</h3>
             <div id="nextEventContent">Betöltés...</div>
         </div>
@@ -36,20 +37,25 @@
 
         <div class="sidebar-card">
             <h3>AKTIVITÁS 2026</h3>
-            <div id="activityChart"></div>
+            <div id="activityChart" class="activity-chart-container"></div>
         </div>
     </aside>
 
     <main class="calendar-section">
-        <div class="month-display-container">
-            <button onclick="changeMonth(-1)">❮</button>
-            <h2 id="currentMonthHeader"></h2>
-            <button onclick="changeMonth(1)">❯</button>
-            <button onclick="goToToday()">Ma</button>
-            <select id="monthSelect"></select>
+        <div class="month-controls">
+            <button class="nav-arrow" onclick="changeMonth(-1)">❮</button>
+            <h2 id="currentMonthHeader">FEBRUÁR</h2>
+            <button class="nav-arrow" onclick="changeMonth(1)">❯</button>
+            
+            <div class="quick-nav">
+                <button class="today-btn" onclick="goToToday()">Ma</button>
+                <select id="monthSelect" class="month-dropdown"></select>
+            </div>
         </div>
 
-        <div id="calendar" class="calendar-grid"></div>
+        <div class="calendar-container">
+            <div id="calendar" class="calendar-grid"></div>
+        </div>
     </main>
 </div>
 
