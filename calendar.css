@@ -1,4 +1,4 @@
-/* --- NAPTÁR OLDAL SPECIFIKUS --- */
+	/* --- NAPTÁR OLDAL SPECIFIKUS --- */
 .calendar-page .main-layout { 
     display: flex; 
     height: 100vh; 
@@ -42,6 +42,13 @@
 	text-transform: uppercase;
 }
 
+.sidebar a[href="index.html"] {
+    transition: opacity 0.2s;
+}
+
+.sidebar a[href="index.html"]:hover {
+    opacity: 0.7;
+}
 .calendar-page .calendar-section { 
     flex: 1; 
     height: 100vh; 
@@ -164,4 +171,5 @@
 		height: auto;
 		border-right: none;
 	}
+
 }
