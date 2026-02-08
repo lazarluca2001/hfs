@@ -5,7 +5,7 @@
     left: 0;
     width: 320px; 
     height: 50px;
-    background: var(--card-bg);
+    background: var(--bg-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -115,7 +115,7 @@
     background-color: #eee !important; /* Világos mód alap */
     transition: .4s;
     border-radius: 20px;
-    border: 2px solid var(--hfs-red) !important; 
+    border: 1px solid var(--hfs-red) !important; 
     box-sizing: border-box !important;
 }
 
@@ -263,4 +263,5 @@
         height: auto;
     }
 }
+
 
