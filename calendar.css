@@ -1,31 +1,17 @@
-/* --- ALAPOK ÉS GÖRDÜLÉS --- */
-html, body {
-    margin: 0;
-    padding: 0;
-    height: auto;
-    overflow-y: auto;
-}
-
-/* --- FIX NAV --- */
+/* FIX NAV */
 .fixed-nav {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
+    right: 0;
     height: 50px;
     background: var(--card-bg);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
+    padding: 0 16px;
     border-bottom: 1px solid var(--border-color);
     z-index: 1000;
-}
-
-.nav-left {
-    display: flex;
-    gap: 15px;
-    align-items: center;
 }
 
 .filter-toggle-btn {
@@ -33,32 +19,26 @@ html, body {
     color: #fff;
     border: none;
     padding: 6px 12px;
-    border-radius: 5px;
-    font-size: 0.75em;
-    font-weight: bold;
+    border-radius: 6px;
+    font-weight: 700;
     cursor: pointer;
 }
 
-.filter-toggle-btn:hover {
-    background: #a00000;
-}
-
-/* --- LAYOUT --- */
+/* LAYOUT */
 .calendar-page .main-layout {
     display: flex;
-    min-height: 100vh;
     padding-top: 50px;
+    min-height: 100vh;
 }
 
-.calendar-page .sidebar {
+.sidebar {
     width: 320px;
     background: var(--card-bg);
-    padding: 20px;
+    padding: 16px;
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    transition: all 0.3s ease;
+    gap: 16px;
 }
 
 .sidebar.collapsed {
@@ -68,93 +48,65 @@ html, body {
     border: none;
 }
 
+.sidebar-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+}
+
 .calendar-section {
     flex: 1;
-    background: var(--bg-color);
     padding: 20px;
 }
 
-/* --- SZŰRŐK --- */
-.member-filter {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-}
-
-.filter-btn {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    padding: 8px 6px;
-    border-radius: 6px;
-    font-size: 0.8em;
-    font-weight: 600;
-    cursor: pointer;
+/* MONTH HEADER */
+.month-display-container {
     display: flex;
-    justify-content: center;
-    gap: 6px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
-.filter-btn.active {
-    border-color: var(--hfs-red);
-    background: var(--hfs-light-red);
+.month-display-container h2 {
     color: var(--hfs-red);
+    margin: 0 10px;
 }
 
-/* --- DARK MODE TOGGLE --- */
-.theme-switch {
-    position: relative;
-    width: 38px;
-    height: 20px;
+.month-display-container button,
+.month-display-container select {
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 6px 10px;
+    cursor: pointer;
 }
 
-.theme-switch input {
-    opacity: 0;
-}
-
-.theme-switch .slider {
-    position: absolute;
-    inset: 0;
-    border-radius: 20px;
-    border: 2px solid var(--hfs-red);
-    background: #eee;
-}
-
-.theme-switch .slider:before {
-    content: "";
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    left: 2px;
-    bottom: 2px;
-    background: var(--hfs-red);
-    border-radius: 50%;
-    transition: 0.3s;
-}
-
-.theme-switch input:checked + .slider:before {
-    transform: translateX(18px);
-    background: #fff;
-}
-
-/* --- NAPTÁR --- */
+/* CALENDAR GRID */
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 1px;
     background: var(--border-color);
+    gap: 1px;
 }
 
 .weekday {
-    background: var(--card-bg);
-    padding: 6px;
-    font-weight: bold;
+    background: var(--hfs-red);
+    color: #fff;
+    font-weight: 700;
     text-align: center;
+    padding: 8px;
 }
 
 .day {
     background: var(--card-bg);
-    padding: 6px;
     min-height: 110px;
+    padding: 6px;
+    position: relative;
+}
+
+.day.today {
+    background: var(--today-bg);
+    outline: 2px solid var(--hfs-red);
 }
 
 .day-number {
@@ -162,23 +114,77 @@ html, body {
     opacity: 0.6;
 }
 
-/* --- MOBIL --- */
+/* EVENT CARD */
+.event-card {
+    margin-top: 6px;
+    background: var(--event-card-bg);
+    border: 1px solid var(--event-card-border);
+    border-radius: 10px;
+    padding: 6px;
+}
+
+.event-title {
+    font-weight: 700;
+    font-size: 0.75em;
+    color: var(--hfs-red);
+}
+
+.participants-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.person-tag {
+    font-size: 0.75em;
+    border-radius: 12px;
+    padding: 2px 6px;
+    border: 1px solid;
+}
+
+.status-biztos {
+    border-color: var(--status-biztos-border);
+}
+
+.status-talan {
+    border-color: var(--status-talan-border);
+}
+
+/* FILTER */
+.member-filter {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.filter-btn {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--card-bg);
+}
+
+.filter-btn.active {
+    background: var(--hfs-light-red);
+    border-color: var(--hfs-red);
+    color: var(--hfs-red);
+}
+
+/* MOBILE */
 @media (max-width: 1024px) {
-    .calendar-page .sidebar {
+    .sidebar {
         position: fixed;
         top: 50px;
         left: 0;
-        width: 100%;
         height: calc(100vh - 50px);
         transform: translateX(-100%);
+        transition: transform .3s;
         z-index: 999;
     }
-
-    .calendar-page .sidebar.open {
+    .sidebar.open {
         transform: translateX(0);
-    }
-
-    .calendar-section {
-        overflow-x: auto;
     }
 }
