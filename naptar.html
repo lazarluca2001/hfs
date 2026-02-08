@@ -11,13 +11,17 @@
 
 <div class="main-layout">
     <aside class="sidebar">
-        <a href="index.html" class="sidebar-link">
-    ❮ VISSZA A FŐOLDALRA
-</a>
+        <a href="index.html" class="sidebar-link">❮ FŐOLDAL</a>
+        <div class="theme-switch-wrapper">
+            <span>Sötét mód</span>
+            <label class="theme-switch">
+                <input type="checkbox" id="checkbox">
+                <span class="slider"></span>
+            </label>
+        </div>
         <div class="sidebar-card">
             <h3>KÖVETKEZŐ ÁLLOMÁS</h3>
             <div id="nextEventContent" class="text-content">Betöltés...</div>
-            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
         </div>
         <div class="sidebar-card">
             <h3>TAGOK SZŰRÉSE</h3>
@@ -27,13 +31,6 @@
             <h3>AKTIVITÁS 2026</h3>
             <div id="activityChart" class="activity-chart-container">
             </div>
-        </div>
-        <div class="theme-switch-wrapper">
-            <span>Sötét mód</span>
-            <label class="theme-switch">
-                <input type="checkbox" id="checkbox">
-                <span class="slider"></span>
-            </label>
         </div>
     </aside>
 
@@ -57,6 +54,7 @@
 </body>
 
 </html>
+
 
 
 
