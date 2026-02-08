@@ -1,3 +1,8 @@
+body, html {
+    overflow-y: auto !important; /* Engedjük a főoldal görgetését */
+    height: auto;
+}
+
 /* --- FIXÁLT BAL FELSŐ NAVIGÁCIÓ --- */
 .fixed-nav {
     position: fixed;
@@ -18,25 +23,23 @@
 }
 
 /* --- NAPTÁR OLDAL ELRENDEZÉS --- */
-.calendar-page .main-layout { 
-    display: flex; 
-    height: 100vh; 
-    width: 100vw; 
+.calendar-page .main-layout {
+    display: flex;
+    min-height: 100vh;
+    padding-top: 50px; /* A fix nav miatt */
 }
 
 .calendar-page .sidebar {
     width: 320px;
     min-width: 320px;
     background: var(--card-bg);
-    padding: 70px 20px 20px 20px;
+    padding: 20px;
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     gap: 15px;
-    height: 100vh;
-    box-sizing: border-box;
-    z-index: 10;
-    overflow-y: auto;
+    transition: transform 0.3s ease, width 0.3s ease, margin 0.3s ease;
+    z-index: 90;
 }
 
 /* Egyedi görgetősáv a sidebarhoz */
@@ -202,9 +205,9 @@
 .chart-emoji { font-size: 0.9em; margin-top: 5px; }
 
 /* --- NAPTÁR SZEKCIÓ --- */
-.calendar-section { 
-    flex: 1; height: 100vh; display: flex; flex-direction: column; 
-    background: var(--bg-color); overflow-y: auto; 
+.calendar-section {
+    flex: 1;
+    background: var(--bg-color);
 }
 
 .month-display-container {
@@ -214,6 +217,24 @@
 
 .month-title-group { display: flex; align-items: center; gap: 25px; }
 .month-display { color: var(--hfs-red); font-size: 2em; font-weight: 800; text-transform: uppercase; margin: 0; }
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.filter-toggle-btn {
+    background: var(--hfs-red);
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 0.75em;
+    font-weight: bold;
+    cursor: pointer;
+    display: none; /* Alapból rejtve weben */
+}
 
 .nav-btn {
     background: var(--hfs-red); color: white; border: none; border-radius: 50%;
@@ -271,5 +292,38 @@
     }
 }
 
+@media (max-width: 1024px) {
+    .filter-toggle-btn {
+        display: block; /* Megjelenik a gomb */
+    }
 
+    .calendar-page .sidebar {
+        position: fixed;
+        top: 50px;
+        left: 0;
+        height: calc(100vh - 50px);
+        width: 100%;
+        transform: translateX(-100%); /* Rejtve balra */
+        margin-left: 0;
+        overflow-y: auto;
+        background: var(--card-bg);
+        box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+    }
 
+    .calendar-page .sidebar.open {
+        transform: translateX(0); /* Besúszik */
+    }
+
+    .calendar-grid {
+        grid-template-columns: repeat(7, minmax(100px, 1fr)); /* Gördíthető rács mobilon */
+    }
+}
+
+.sidebar.collapsed {
+    width: 0;
+    min-width: 0;
+    padding: 0;
+    margin-left: -320px;
+    overflow: hidden;
+    border: none;
+}
