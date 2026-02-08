@@ -11,11 +11,11 @@
 
 <nav class="fixed-nav">
     <div class="nav-left">
-        <a href="index.html" class="back-btn">❮ FŐOLDAL</a>
+        <a href="index.html" class="back-link">❮ FŐOLDAL</a>
         <button id="sidebarToggle" class="filter-toggle-btn">🔍 SZŰRŐK</button>
     </div>
-    <div class="theme-switch-wrapper">
-        <span class="theme-label">Sötét mód</span>
+    <div class="theme-wrap">
+        <span>Sötét mód</span>
         <label class="theme-switch">
             <input type="checkbox" id="checkbox">
             <span class="slider"></span>
@@ -24,8 +24,8 @@
 </nav>
 
 <div class="main-layout">
-    <aside class="sidebar">
-        <div class="sidebar-card next-event">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-card">
             <h3>KÖVETKEZŐ ÁLLOMÁS</h3>
             <div id="nextEventContent">Betöltés...</div>
         </div>
@@ -42,20 +42,18 @@
     </aside>
 
     <main class="calendar-section">
-        <div class="month-controls">
+        <div class="month-display-container">
             <button class="nav-arrow" onclick="changeMonth(-1)">❮</button>
             <h2 id="currentMonthHeader">FEBRUÁR</h2>
             <button class="nav-arrow" onclick="changeMonth(1)">❯</button>
-            
-            <div class="quick-nav">
-                <button class="today-btn" onclick="goToToday()">Ma</button>
-                <select id="monthSelect" class="month-dropdown"></select>
-            </div>
+        </div>
+        
+        <div class="quick-controls">
+            <button class="today-btn" onclick="goToToday()">Ma</button>
+            <select id="monthSelect" class="month-select"></select>
         </div>
 
-        <div class="calendar-container">
-            <div id="calendar" class="calendar-grid"></div>
-        </div>
+        <div id="calendar" class="calendar-grid"></div>
     </main>
 </div>
 
