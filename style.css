@@ -15,7 +15,7 @@
     --today-bg: #ffebee;
     --empty-day-fill: #f9f9f9;
     --empty-dots: #e0e0e0;
-    /* Új landing page változók */
+    /* Landing page változók */
     --overlay: rgba(0, 0, 0, 0.6);
     --white: #ffffff;
 }
@@ -46,181 +46,197 @@ body, html {
     color: var(--text-color); 
 }
 
-/* --- NAPTÁR LAYOUT ELEMEI --- */
-.main-layout { display: flex; height: 100vh; width: 100vw; }
+/* --- NAPTÁR LAYOUT JAVÍTÁSA --- */
+.calendar-page .main-layout { 
+    display: flex; 
+    height: 100vh; 
+    width: 100vw; 
+    overflow: hidden; 
+}
 
-.sidebar {
+/* Sidebar fixálása a 2. kép alapján */
+.calendar-page .sidebar {
     width: 320px;
+    min-width: 320px;
     background: var(--card-bg);
-    padding: 20px;
+    padding: 25px;
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
     height: 100vh;
     box-sizing: border-box;
     z-index: 10;
 }
 
-.sidebar-logo { color: var(--hfs-red); font-size: 1.3em; margin: 0; letter-spacing: 1px; font-weight: 900; }
-
-.calendar-section { flex: 1; height: 100vh; display: flex; flex-direction: column; background: var(--bg-color); overflow-y: auto; }
-
-.month-display-container {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 15px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); gap: 10px;
+.sidebar-logo { 
+    color: var(--hfs-red); 
+    font-size: 1.5em; 
+    margin: 0 0 10px 0; 
+    letter-spacing: 1px; 
+    font-weight: 900; 
+    text-transform: uppercase;
 }
 
-.month-display { color: var(--hfs-red); font-size: 2.2em; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
+.calendar-page .calendar-section { 
+    flex: 1; 
+    height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    background: var(--bg-color); 
+    overflow-y: auto; 
+}
 
-.nav-btn {
-    background: var(--hfs-red); color: white; border: none; border-radius: 50%;
-    width: 38px; height: 38px; cursor: pointer; font-size: 1.2em;
-    display: flex; align-items: center; justify-content: center; transition: transform 0.2s;
+/* Gombok és szűrők javítása (2. kép állapota) */
+.filter-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: var(--text-color);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.85em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.filter-btn.active { 
+    border-color: var(--hfs-red); 
+    background: var(--hfs-light-red); 
+    color: var(--hfs-red);
+}
+
+/* Naptár rács és napok (3. kép elvárt állapota) */
+.month-display-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    gap: 15px;
 }
 
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    grid-auto-rows: auto;
     gap: 1px;
     background: var(--border-color);
     width: 100%;
 }
 
 .weekday { 
-    background: var(--hfs-red); color: #ffffff; height: 32px;
-    display: flex; align-items: center; justify-content: center; 
-    font-weight: bold; font-size: 0.75em; text-transform: uppercase;
-}
-
-.day { background: var(--card-bg); padding: 8px; display: flex; flex-direction: column; box-sizing: border-box; position: relative; min-height: 130px; }
-.today { background: var(--today-bg) !important; box-shadow: inset 0 0 0 2px var(--hfs-red); }
-
-.event-card { 
-    background-color: var(--event-card-bg); padding: 8px; border-radius: 10px; 
-    border: 1px solid var(--event-card-border); margin-bottom: 8px;
-}
-
-.person-tag { 
-    background: var(--status-biztos-bg); padding: 4px 8px; border-radius: 15px; 
-    font-size: 0.75em; font-weight: 600; display: flex; align-items: center; gap: 5px;
-    border: 1px solid var(--border-color); color: var(--text-color);
-    border-left: 4px solid #ccc;
-}
-
-/* --- LANDING PAGE (INDEX.HTML) SPECIFIKUS STÍLUSOK --- */
-
-.hero-section {
-    background: linear-gradient(var(--overlay), var(--overlay)), 
-                url('https://i.imgur.com/Ju3pqgF.jpeg'); 
-    background-size: cover;
-    background-position: center;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    color: var(--white);
-}
-
-.landing-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 30px 50px;
-    z-index: 10;
-}
-
-.landing-nav .logo {
-    font-size: 1.5rem;
-    font-weight: 900;
-    letter-spacing: 2px;
+    background: var(--hfs-red); 
+    color: #ffffff; 
+    height: 40px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: bold; 
+    font-size: 0.8em; 
     text-transform: uppercase;
-    color: var(--white);
 }
 
-.nav-links {
-    display: flex;
-    gap: 30px;
-}
-
-.nav-links a {
-    color: var(--white);
-    text-decoration: none;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    transition: opacity 0.3s;
-}
-
-.landing-content {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end; /* A szöveg maradjon a jobb oldalon */
-    padding: 0 10%;
+.day { 
+    background: var(--card-bg); 
+    padding: 10px; 
+    display: flex; 
+    flex-direction: column; 
+    min-height: 140px; 
     position: relative;
 }
 
-.main-text h1 {
-    font-size: 5rem;
-    line-height: 1.1;
-    margin: 0;
-    font-weight: 900;
-    text-transform: uppercase;
-    color: var(--white);
+.day-number { 
+    font-weight: 800; 
+    color: var(--text-color); 
+    opacity: 0.4; 
+    font-size: 0.9em; 
+    margin-bottom: 8px; 
 }
 
-.cta-button {
-    display: inline-block;
-    margin-top: 30px;
-    padding: 12px 30px;
-    border: 2px solid var(--white);
-    color: var(--white);
-    text-decoration: none;
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 2px;
-    transition: all 0.3s;
+.today { 
+    background: var(--today-bg) !important; 
+    box-shadow: inset 0 0 0 2px var(--hfs-red); 
 }
 
-.cta-button:hover {
-    background-color: var(--white);
-    color: #000;
+/* Esemény kártyák a naptárban */
+.event-card { 
+    background-color: var(--event-card-bg); 
+    padding: 8px; 
+    border-radius: 10px; 
+    border: 1px solid var(--event-card-border); 
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.event-title { 
+    font-weight: 800; 
+    color: var(--hfs-red); 
+    font-size: 0.8em; 
+    margin-bottom: 6px; 
+    display: block; 
+}
+
+.person-tag { 
+    background: var(--status-biztos-bg); 
+    padding: 3px 8px; 
+    border-radius: 15px; 
+    font-size: 0.7em; 
+    font-weight: 700; 
+    display: flex; 
+    align-items: center; 
+    gap: 4px;
+    border: 1px solid var(--border-color);
+    border-left: 4px solid #ccc;
+    margin-bottom: 2px;
+}
+
+/* --- LANDING PAGE SPECIFIKUS STÍLUSOK --- */
+.hero-section {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(var(--overlay), var(--overlay)), 
+                url("https://i.imgur.com/Ju3pqgF.jpeg"); 
+    background-size: cover;
+    background-position: center;
+    color: var(--white);
 }
 
 .side-title {
     position: absolute;
-    right: 8%; /* Kicsit beljebb hoztuk a szélétől */
+    right: 8%;
     top: 50%;
     transform: translateY(-50%);
-    font-size: clamp(4rem, 10vw, 9rem); /* Rugalmas méretezés */
+    font-size: clamp(4rem, 10vw, 9rem);
     font-weight: 900;
-    opacity: 0.7; /* Kontrasztosabb (korábban 0.2 volt) */
+    opacity: 0.7;
     line-height: 0.85;
     text-align: right;
     pointer-events: none;
     color: var(--white);
-    letter-spacing: 15px; /* Több hely a betűk/szavak között */
+    letter-spacing: 15px;
     text-transform: uppercase;
 }
 
-/* Sötét mód kapcsoló esztétikája */
-.theme-switch-wrapper { margin-top: auto; padding-top: 10px; display: flex; align-items: center; gap: 10px; font-size: 0.8em; font-weight: 600; }
-.theme-switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+/* Kapcsoló és egyéb elemek */
+.theme-switch-wrapper { margin-top: auto; padding-top: 15px; display: flex; align-items: center; gap: 10px; font-size: 0.85em; font-weight: 600; }
+.theme-switch { position: relative; display: inline-block; width: 44px; height: 22px; }
 .theme-switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
-.slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
 input:checked + .slider { background-color: var(--hfs-red); }
-input:checked + .slider:before { transform: translateX(20px); }
+input:checked + .slider:before { transform: translateX(22px); }
 
-/* Reszponzivitás */
+/* Reszponzivitás javítása */
 @media (max-width: 768px) {
-    .main-layout { flex-direction: column; }
-    .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-color); }
-    .main-text h1 { font-size: 3rem; }
+    .calendar-page .main-layout { flex-direction: column; height: auto; overflow: visible; }
+    .calendar-page .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-color); }
+    .calendar-page .calendar-section { height: auto; }
     .side-title { display: none; }
 }
-
-
-
