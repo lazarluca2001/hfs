@@ -1,5 +1,5 @@
 /* --- VÁLTOZÓK ÉS SZÍNEK --- */
-:root { 
+:root {
     --hfs-red: #800000;
     --hfs-light-red: #fff0f0; 
     --bg-color: #f4f4f4;
@@ -8,6 +8,15 @@
     --border-color: #dddddd;
     --white: #ffffff;
     --overlay: rgba(0, 0, 0, 0.6);
+	--event-card-bg: #fff5f5;
+    --event-card-border: #eecaca;
+    --status-biztos-bg: #ffffff;
+    --status-biztos-border: #2e7d32;
+    --status-talan-bg: #ffffff;
+    --status-talan-border: #ef6c00;
+    --today-bg: #ffebee;
+    --empty-day-fill: #f9f9f9;
+    --empty-dots: #e0e0e0;
 }
 
 [data-theme="dark"] {
@@ -17,6 +26,13 @@
     --border-color: #333333;
     --hfs-red: #ff4d4d;
     --hfs-light-red: #2a1515;
+	--event-card-bg: #241a1a;
+    --event-card-border: #4a2a2a;
+    --status-biztos-bg: #2a2a2a;
+    --status-talan-bg: #2a2a2a;
+    --today-bg: #3d0a0a;
+    --empty-day-fill: #141414;
+    --empty-dots: #252525;
 }
 
 /* --- ALAPBEÁLLÍTÁSOK --- */
@@ -37,3 +53,4 @@ body, html {
 .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
 input:checked + .slider { background-color: var(--hfs-red); }
 input:checked + .slider:before { transform: translateX(22px); }
+
