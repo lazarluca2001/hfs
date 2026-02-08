@@ -309,7 +309,7 @@ function updateActivityChart() {
     allEvents.forEach(e => {
         Object.keys(resztvevokMap).forEach(name => {
             const s = (e[name] || "").toLowerCase();
-            if (["igen", "fizetve", "igazolt"].some(vs => s.includes(vs))) {
+            if (["igen", "fizetve", "igazolt", "talán"].some(vs => s.includes(vs))) {
                 stats[name]++;
             }
         });
@@ -340,3 +340,4 @@ function updateActivityChart() {
         chartContainer.appendChild(createColumn(stats[name], resztvevokMap[name], stats[name]));
     });
 }
+
