@@ -5,7 +5,7 @@
     left: 0;
     width: 320px; 
     height: 50px;
-    background: var(--card-bg);
+    background: var(--bg-color);
     display: flex;             /* Ez teszi egy sorba az elemeket */
     justify-content: space-between; /* Ez tolja a két szélre őket */
     align-items: center;       /* Ez igazítja őket függőlegesen középre */
@@ -96,7 +96,7 @@
 .slider {
     position: absolute; cursor: pointer;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: var(--bg-color); transition: .4s; border-radius: 20px;
+    background-color: var(--card-bg); transition: .4s; border-radius: 20px;
 }
 
 .slider:before {
@@ -106,7 +106,7 @@
     width: 34px;  /* Megnövelt gombméret */
     left: 3px;
     bottom: 3px;
-    background-color: white;
+    background-color: var(--hfs-red);
     transition: .4s;
     border-radius: 50%;
     z-index: 2;
@@ -236,5 +236,6 @@ input:checked + .slider:before {
         height: auto;
     }
 }
+
 
 
