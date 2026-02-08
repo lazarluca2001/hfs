@@ -3,11 +3,11 @@
     --hfs-red: #800000;
     --hfs-red-hover: #a00000;
     --hfs-light-red: #fff0f0;
-    --bg-color: #f8f9fa;
+    --bg-color: #f4f4f4;
     --card-bg: #ffffff;
     --text-color: #333;
     --text-muted: #666;
-    --border-color: #eee;
+    --border-color: #ddd;
     --nav-bg: #ffffff;
 
     --empty-day-fill: #f9f9f9;
@@ -25,13 +25,14 @@
 }
 
 [data-theme="dark"] {
-    --bg-color: #121212;
-    --card-bg: #1e1e1e;
-    --text-color: #e0e0e0;
+    --bg-color: #0a0a0a;
+    --card-bg: #1a1a1a;
+    --text-color: #f0f0f0;
     --text-muted: #aaa;
     --border-color: #333;
     --nav-bg: #1e1e1e;
 
+    --hfs-red: #ff4d4d;
     --hfs-light-red: #2d1a1a;
     --empty-day-fill: #1a1a1a;
     --empty-dots: #333333;
@@ -210,3 +211,4 @@ input:checked + .slider:before { transform: translateX(20px); }
     .calendar-grid { grid-template-columns: repeat(7, minmax(130px, 1fr)); }
     .calendar-section { overflow-x: auto; }
 }
+
