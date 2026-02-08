@@ -9,247 +9,179 @@ const resztvevokMap = {
 };
 
 const validStatuses = ["igen", "talán", "talan", "fizetve", "igazolt"];
-
 let allEvents = [];
 let activeFilter = null;
 let currentMonthIdx = new Date().getMonth();
+const currentYear = 2026;
 
-/* --- THEME --- */
-function initTheme() {
-    const toggle = document.getElementById('checkbox');
-    if (!toggle) return;
-    const saved = localStorage.getItem('theme');
-    if (saved === 'dark') {
-        document.documentElement.dataset.theme = 'dark';
-        toggle.checked = true;
-    }
-    toggle.onchange = () => {
-        const theme = toggle.checked ? 'dark' : 'light';
-        document.documentElement.dataset.theme = theme;
-        localStorage.setItem('theme', theme);
-    };
-}
-
-/* --- DATA LOADING --- */
 async function initCalendar() {
     try {
         const res = await fetch(wishlistUrl);
         const csv = await res.text();
+        const rows = csv.split('\n').map(r => r.split(',').map(c => c.replace(/"/g, '').trim()));
+        
+        const headers = rows.find(r => r.includes('Event'));
+        if (!headers) return;
 
-        const rows = csv
-            .split('\n')
-            .map(r => r.split(',').map(c => c.replace(/"/g, '').trim()))
-            .filter(r => r.length > 1);
-
-        const headerRowIndex = rows.findIndex(r => r.includes('Event'));
-        if (headerRowIndex === -1) return;
-
-        const headers = rows[headerRowIndex];
-        allEvents = [];
-
-        for (let i = headerRowIndex + 1; i < rows.length; i++) {
-            const row = rows[i];
-            const obj = {};
-            headers.forEach((h, idx) => {
-                if (h && row[idx]) obj[h] = row[idx];
-            });
-
-            if (obj.Event) {
+        allEvents = rows.slice(rows.indexOf(headers) + 1)
+            .filter(r => r[headers.indexOf('Event')])
+            .map(row => {
+                const obj = {};
+                headers.forEach((h, i) => obj[h] = row[i]);
                 obj._start = parseDate(obj["Start date"]);
                 obj._end = parseDate(obj["End date"]);
-                if (obj._start) allEvents.push(obj);
-            }
-        }
+                return obj;
+            })
+            .filter(e => e._start);
 
         renderFilter();
         setupMonthSelect();
         render(currentMonthIdx);
         updateNext();
         updateActivityChart();
-
     } catch (e) {
-        console.error("CSV hiba:", e);
+        console.error("Hiba az adatok betöltésekor:", e);
     }
 }
 
 function parseDate(d) {
     if (!d) return null;
-    const clean = d.toString().trim().replace(/\.$/, '');
-    
-    if (clean.includes('-')) {
-        const dt = new Date(clean);
-        return isNaN(dt) ? null : dt;
-    }
-    
-    const p = clean.split('.');
-    if (p.length !== 3) return null;
-    return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+    const parts = d.split('.');
+    if (parts.length >= 3) return new Date(parts[0], parts[1] - 1, parts[2]);
+    const isoDate = new Date(d);
+    return isNaN(isoDate) ? null : isoDate;
 }
 
-/* --- SIDEBAR: NEXT EVENT --- */
-function updateNext() {
-    const nextBox = document.getElementById('nextEventContent');
-    if (!nextBox) return;
-
-    const now = new Date().setHours(0,0,0,0);
-    // Megkeressük a legközelebbi jövőbeli eseményt
-    const upcoming = allEvents
-        .filter(e => e._end && e._end.getTime() >= now)
-        .sort((a, b) => a._start - b._start)[0];
-
-    if (upcoming) {
-        const diff = Math.ceil((upcoming._start - now) / 86400000);
-        nextBox.innerHTML = `
-            <div class="next-event-card">
-                <strong style="display:block; color:var(--hfs-red);">${upcoming.Event}</strong>
-                <small>📍 ${upcoming.Location || 'Ismeretlen'}</small><br>
-                <small>📅 ${upcoming["Start date"]}</small><br>
-                <p style="margin-top:10px; font-weight:bold;">
-                    ${diff <= 0 ? "Ma kezdődik! 🔥" : "Még " + diff + " nap"}
-                </p>
-            </div>
-        `;
-    } else {
-        nextBox.innerHTML = "Nincs kitűzött esemény.";
-    }
-}
-
-/* --- SIDEBAR: ACTIVITY CHART --- */
-function updateActivityChart() {
-    const chartContainer = document.getElementById('activityChart');
-    if (!chartContainer || allEvents.length === 0) return;
-
-    chartContainer.innerHTML = '';
-    const total = allEvents.length;
-
-    Object.keys(resztvevokMap).forEach(name => {
-        const count = allEvents.filter(e => {
-            const status = (e[name] || "").toLowerCase();
-            return validStatuses.some(vs => status.includes(vs));
-        }).length;
-
-        const height = (count / total) * 100;
-        
-        const col = document.createElement('div');
-        col.className = 'chart-column-wrapper';
-        col.innerHTML = `
-            <span class="chart-label">${count}</span>
-            <div class="chart-bar" style="height: ${height}px"></div>
-            <span class="chart-emoji">${resztvevokMap[name]}</span>
-        `;
-        chartContainer.appendChild(col);
-    });
-}
-
-/* --- FILTER --- */
-function renderFilter() {
-    const box = document.getElementById('memberFilter');
-    if (!box) return;
-    box.innerHTML = '';
-    Object.keys(resztvevokMap).forEach(n => {
-        const b = document.createElement('div');
-        b.className = `filter-btn ${activeFilter === n ? 'active' : ''}`;
-        b.innerHTML = `<span>${resztvevokMap[n]}</span> ${n}`;
-        b.onclick = () => {
-            activeFilter = activeFilter === n ? null : n;
-            renderFilter();
-            render(currentMonthIdx);
-        };
-        box.appendChild(b);
-    });
-}
-
-/* --- CALENDAR RENDER --- */
 function render(m) {
     const cal = document.getElementById('calendar');
-    if (!cal) return;
-    cal.innerHTML = '';
-
+    const header = document.getElementById('currentMonthHeader');
     const months = ["Január","Február","Március","Április","Május","Június","Július","Augusztus","Szeptember","Október","November","December"];
-    document.getElementById('currentMonthHeader').innerText = months[m];
+    
+    header.innerText = months[m];
+    cal.innerHTML = ["H","K","Sze","Cs","P","Szo","V"].map(d => `<div class="weekday">${d}</div>`).join('');
 
-    ["H","K","Sze","Cs","P","Szo","V"].forEach(d => cal.innerHTML += `<div class="weekday">${d}</div>`);
+    const firstDay = (new Date(currentYear, m, 1).getDay() + 6) % 7;
+    const daysInMonth = new Date(currentYear, m + 1, 0).getDate();
 
-    const first = (new Date(2026, m, 1).getDay() + 6) % 7;
-    const days = new Date(2026, m + 1, 0).getDate();
+    for (let i = 0; i < firstDay; i++) cal.innerHTML += `<div class="day empty"></div>`;
 
-    for (let i = 0; i < first; i++) cal.innerHTML += `<div class="day empty-day-pre"></div>`;
-
-    for (let d = 1; d <= days; d++) {
-        const currDate = new Date(2026, m, d);
-        const currTimestamp = currDate.setHours(0,0,0,0);
-        const todayTimestamp = new Date().setHours(0,0,0,0);
+    for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(currentYear, m, d).setHours(0,0,0,0);
+        const isToday = date === new Date().setHours(0,0,0,0);
         
-        const dailyEvents = allEvents.filter(e => 
-            currTimestamp >= e._start.getTime() && 
-            currTimestamp <= e._end.getTime()
-        );
-
-        let html = `<div class="day ${todayTimestamp === currTimestamp ? 'today' : ''}">
-                    <span class="day-number">${d}</span>`;
-
+        const dailyEvents = allEvents.filter(e => date >= e._start.getTime() && date <= e._end.getTime());
+        
+        let eventHtml = '';
         dailyEvents.forEach(e => {
-            let tags = "";
+            let tags = '';
             Object.keys(resztvevokMap).forEach(name => {
                 const status = (e[name] || "").toLowerCase();
                 if (validStatuses.some(vs => status.includes(vs)) && (!activeFilter || activeFilter === name)) {
                     const isTalan = status.includes("talan") || status.includes("talán");
-                    tags += `<div class="person-tag ${isTalan ? 'status-talan' : 'status-biztos'}">${resztvevokMap[name]}</div>`;
+                    tags += `<div class="person-tag ${isTalan ? 'status-talan' : 'status-biztos'}" title="${name}">${resztvevokMap[name]}</div>`;
                 }
             });
 
             if (tags) {
-                html += `<div class="event-card">
-                            <span class="event-title">${e.Event}</span>
-                            <div class="participants-container">${tags}</div>
-                         </div>`;
+                eventHtml += `
+                    <div class="event-card">
+                        <span class="event-title">${e.Event}</span>
+                        <div class="participants-container">${tags}</div>
+                    </div>`;
             }
         });
 
-        html += `</div>`;
-        cal.innerHTML += html;
+        cal.innerHTML += `
+            <div class="day ${isToday ? 'today' : ''}">
+                <span class="day-number">${d}</span>
+                ${eventHtml}
+            </div>`;
     }
 }
 
-/* --- CONTROLS --- */
+/* Kiegészítő funkciók (szűrő, chart, navigáció) */
+function renderFilter() {
+    const container = document.getElementById('memberFilter');
+    container.innerHTML = Object.keys(resztvevokMap).map(name => `
+        <button class="filter-btn ${activeFilter === name ? 'active' : ''}" onclick="toggleFilter('${name}')">
+            <span>${resztvevokMap[name]}</span> ${name}
+        </button>
+    `).join('');
+}
+
+window.toggleFilter = (name) => {
+    activeFilter = activeFilter === name ? null : name;
+    renderFilter();
+    render(currentMonthIdx);
+};
+
+window.changeMonth = (delta) => {
+    currentMonthIdx = (currentMonthIdx + delta + 12) % 12;
+    document.getElementById('monthSelect').value = currentMonthIdx;
+    render(currentMonthIdx);
+};
+
 function setupMonthSelect() {
     const sel = document.getElementById('monthSelect');
-    if (!sel) return;
-    sel.innerHTML = '';
-    ["Január","Február","Március","Április","Május","Június","Július","Augusztus","Szeptember","Október","November","December"]
-        .forEach((m,i)=> sel.innerHTML += `<option value="${i}" ${i === currentMonthIdx ? 'selected' : ''}>${m}</option>`);
-    
-    sel.onchange = e => {
-        currentMonthIdx = parseInt(e.target.value);
-        render(currentMonthIdx);
-    };
+    const months = ["Január","Február","Március","Április","Május","Június","Július","Augusztus","Szeptember","Október","November","December"];
+    sel.innerHTML = months.map((m, i) => `<option value="${i}" ${i === currentMonthIdx ? 'selected' : ''}>${m}</option>`).join('');
+    sel.onchange = (e) => { currentMonthIdx = parseInt(e.target.value); render(currentMonthIdx); };
 }
 
-function changeMonth(d) {
-    currentMonthIdx = (currentMonthIdx + d + 12) % 12;
-    const sel = document.getElementById('monthSelect');
-    if (sel) sel.value = currentMonthIdx;
-    render(currentMonthIdx);
+function updateActivityChart() {
+    const container = document.getElementById('activityChart');
+    const total = allEvents.length;
+    if (total === 0) return;
+
+    container.innerHTML = Object.keys(resztvevokMap).map(name => {
+        const count = allEvents.filter(e => {
+            const s = (e[name] || "").toLowerCase();
+            return validStatuses.some(vs => s.includes(vs));
+        }).length;
+        const height = (count / total) * 60 + 10; // Arányos magasság
+        return `
+            <div class="chart-column-wrapper">
+                <span class="chart-label">${count}</span>
+                <div class="chart-bar" style="height: ${height}px"></div>
+                <span class="chart-emoji">${resztvevokMap[name]}</span>
+            </div>`;
+    }).join('');
 }
 
-function goToToday() {
-    currentMonthIdx = new Date().getMonth();
-    const sel = document.getElementById('monthSelect');
-    if (sel) sel.value = currentMonthIdx;
-    render(currentMonthIdx);
-}
+function updateNext() {
+    const container = document.getElementById('nextEventContent');
+    const now = new Date().setHours(0,0,0,0);
+    const next = allEvents.filter(e => e._end.getTime() >= now).sort((a,b) => a._start - b._start)[0];
 
-/* --- INIT --- */
-document.addEventListener('DOMContentLoaded', () => {
-    initTheme();
-    initCalendar();
-
-    const btn = document.getElementById('sidebarToggle');
-    const sidebar = document.querySelector('.sidebar');
-    if (btn && sidebar) {
-        btn.onclick = () => {
-            const isMobile = window.innerWidth <= 1024;
-            sidebar.classList.toggle(isMobile ? 'open' : 'collapsed');
-        };
+    if (next) {
+        const diff = Math.ceil((next._start - now) / 86400000);
+        container.innerHTML = `
+            <div class="next-event-card">
+                <strong style="color:var(--hfs-red); display:block; margin-bottom:5px;">${next.Event}</strong>
+                <div style="font-size:0.85em; color:var(--text-muted);">
+                    📍 ${next.Location || 'Helyszín...'}<br>
+                    📅 ${next["Start date"]}
+                </div>
+                <div style="margin-top:10px; font-weight:bold; font-size:0.9em;">
+                    ${diff <= 0 ? "🔥 ÉPPEN ZAJLIK" : "🚀 Még " + diff + " nap"}
+                </div>
+            </div>`;
     }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initCalendar();
+    // Theme Switcher logikája
+    const toggle = document.getElementById('checkbox');
+    if(localStorage.getItem('theme') === 'dark') {
+        document.documentElement.dataset.theme = 'dark';
+        toggle.checked = true;
+    }
+    toggle.addEventListener('change', () => {
+        const theme = toggle.checked ? 'dark' : 'light';
+        document.documentElement.dataset.theme = theme;
+        localStorage.setItem('theme', theme);
+    });
+    
+    document.getElementById('sidebarToggle').onclick = () => document.querySelector('.sidebar').classList.toggle('open');
 });
