@@ -97,7 +97,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* --- ELRENDEZÉS (LAYOUT) --- */
 .calendar-page .main-layout {
     display: flex; padding-top: 50px;
-    height: 100vh; width: 100vw; overflow: hidden;
+    min-height: 100vh; width: 100vw; overflow-y: auto;
 }
 
 /* SIDEBAR */
@@ -147,7 +147,13 @@ input:checked + .slider:before { transform: translateX(20px); }
 .chart-emoji { margin-top: 8px; font-size: 1.1em; }
 
 /* --- NAPTÁR SZEKCIÓ --- */
-.calendar-section { flex: 1; height: 100vh; display: flex; flex-direction: column; background: var(--bg-color); overflow-y: auto; }
+.calendar-section {
+    flex: 1;
+    min-height: calc(100vh - 50px);
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-color);
+    overflow: visible; }
 
 .month-display-container {
     display: flex; flex-direction: column; align-items: center;
@@ -164,8 +170,12 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 /* NAPTÁR RÁCS */
 .calendar-grid {
-    display: grid; grid-template-columns: repeat(7, 1fr);
-    background: var(--border-color); gap: 1px; width: 100%;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: var(--border-color);
+    gap: 1px;
+    width: 100%;
+    margin-bottom: 20px;
 }
 
 .weekday {
@@ -250,6 +260,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     .calendar-grid { grid-template-columns: repeat(7, minmax(130px, 1fr)); }
     .calendar-section { overflow-x: auto; }
 }
+
 
 
 
