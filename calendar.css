@@ -85,19 +85,20 @@
     opacity: 0.7;
 }
 
-/* --- DARK MODE SWITCHER JAVÍTOTT --- */
+/* --- DARK MODE SWITCHER (STABILIZÁLT VERZIÓ) --- */
 .theme-switch-wrapper {
     display: flex;
     align-items: center;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .theme-switch { 
     position: relative; 
     display: inline-block; 
-    width: 38px;  /* Picit növelve a stabilitásért */
-    height: 20px; 
+    width: 38px; 
+    height: 20px;
+    min-width: 38px; /* Megakadályozza az összecsúszást */
 }
 
 .theme-switch input {
@@ -106,58 +107,58 @@
     height: 0;
 }
 
-.slider {
+/* Használjunk specifikusabb szelektorokat */
+.theme-switch .slider {
     position: absolute;
     cursor: pointer;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #eee; /* Világos szürke, hogy látszódjon a fehér gomb */
+    background-color: #eee !important; /* Világos mód alap */
     transition: .4s;
     border-radius: 20px;
-    border: 1.5px solid var(--hfs-red); /* Erősebb keret */
-    box-sizing: border-box;
-    overflow: hidden;
+    border: 2px solid var(--hfs-red) !important; 
+    box-sizing: border-box !important;
 }
 
-.slider:before {
+.theme-switch .slider:before {
     position: absolute;
     content: "";
     height: 12px;
     width: 12px;
-    left: 3px;
-    bottom: 2.5px;
-    background-color: var(--hfs-red); /* Piros gomb a jobb láthatóságért */
+    left: 2px; /* Igazítva a 2px-es kerethez */
+    bottom: 2px; /* Igazítva a 2px-es kerethez */
+    background-color: var(--hfs-red);
     transition: .4s;
     border-radius: 50%;
     z-index: 5;
 }
 
-/* Ikonok alaphelyzete (Hold) */
-.slider::after { 
-    content: "🌙"; 
-    font-size: 9px;
+/* Ikonok kényszerített megjelenítése */
+.theme-switch .slider::after { 
+    content: "🌙" !important; 
+    font-size: 9px !important;
     position: absolute; 
     right: 4px; 
     top: 50%;
     transform: translateY(-50%);
     transition: 0.4s;
     z-index: 1;
+    display: block !important;
 }
 
-/* Nap ikon sötét módban */
-[data-theme="dark"] .slider::after { 
-    content: "☀️"; 
+/* Sötét mód állapotai */
+[data-theme="dark"] .theme-switch .slider {
+    background-color: #222 !important;
+}
+
+[data-theme="dark"] .theme-switch .slider::after { 
+    content: "☀️" !important; 
     left: 4px;
     right: auto;
 }
 
-/* Sötét mód aktív állapota */
-input:checked + .slider { 
-    background-color: #333; 
-}
-
-input:checked + .slider:before {
+.theme-switch input:checked + .slider:before {
     transform: translateX(18px);
-    background-color: #fff; /* Sötétben fehér gomb */
+    background-color: #fff;
 }
 
 /* --- SIDEBAR KÁRTYÁK --- */
@@ -262,3 +263,4 @@ input:checked + .slider:before {
         height: auto;
     }
 }
+
