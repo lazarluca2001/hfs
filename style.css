@@ -1,3 +1,4 @@
+/* --- NAPTÁR ÉS ÁLTALÁNOS VÁLTOZÓK --- */
 :root { 
     --hfs-red: #800000;
     --hfs-light-red: #fff0f0; 
@@ -14,6 +15,9 @@
     --today-bg: #ffebee;
     --empty-day-fill: #f9f9f9;
     --empty-dots: #e0e0e0;
+    /* Új landing page változók */
+    --overlay: rgba(0, 0, 0, 0.4);
+    --white: #ffffff;
 }
 
 [data-theme="dark"] {
@@ -32,7 +36,17 @@
     --empty-dots: #252525;
 }
 
-body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); }
+/* Alapbeállítások */
+body, html { 
+    margin: 0; 
+    padding: 0; 
+    min-height: 100vh; 
+    font-family: 'Segoe UI', 'Montserrat', sans-serif; 
+    background: var(--bg-color); 
+    color: var(--text-color); 
+}
+
+/* --- NAPTÁR LAYOUT ELEMEI --- */
 .main-layout { display: flex; height: 100vh; width: 100vw; }
 
 .sidebar {
@@ -48,7 +62,7 @@ body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family
     z-index: 10;
 }
 
-.sidebar-logo { color: var(--hfs-red); font-size: 1.3em; margin: 0; letter-spacing: 1px; }
+.sidebar-logo { color: var(--hfs-red); font-size: 1.3em; margin: 0; letter-spacing: 1px; font-weight: 900; }
 
 .calendar-section { flex: 1; height: 100vh; display: flex; flex-direction: column; background: var(--bg-color); overflow-y: auto; }
 
@@ -57,7 +71,6 @@ body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family
     padding: 15px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); gap: 10px;
 }
 
-.month-title-group { display: flex; align-items: center; justify-content: center; gap: 25px; }
 .month-display { color: var(--hfs-red); font-size: 2.2em; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
 
 .nav-btn {
@@ -65,25 +78,6 @@ body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family
     width: 38px; height: 38px; cursor: pointer; font-size: 1.2em;
     display: flex; align-items: center; justify-content: center; transition: transform 0.2s;
 }
-.nav-btn:hover { transform: scale(1.1); }
-
-.controls-row { display: flex; gap: 10px; align-items: center; }
-
-#monthSelect, .today-btn {
-    background: var(--card-bg); border: 2px solid var(--hfs-red); padding: 6px 15px;
-    border-radius: 8px; color: var(--text-color); font-weight: 600; cursor: pointer;
-}
-
-.sidebar-card { background: var(--bg-color); border-radius: 12px; padding: 15px; border: 1px solid var(--border-color); }
-.sidebar-card h3 { margin: 0 0 10px 0; color: var(--hfs-red); font-size: 0.9em; text-transform: uppercase; }
-
-.member-filter { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.filter-btn {
-    background: var(--card-bg); border: 1px solid var(--border-color); padding: 8px 5px;
-    border-radius: 6px; color: var(--text-color); font-weight: 600; cursor: pointer; font-size: 0.8em;
-    display: flex; align-items: center; justify-content: center; gap: 4px;
-}
-.filter-btn.active { border-color: var(--hfs-red); background: var(--hfs-light-red); }
 
 .calendar-grid {
     display: grid;
@@ -101,29 +95,11 @@ body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family
 }
 
 .day { background: var(--card-bg); padding: 8px; display: flex; flex-direction: column; box-sizing: border-box; position: relative; min-height: 130px; }
-
-.empty-day-pre, .empty-day-post {
-    background-color: var(--empty-day-fill);
-    background-image: radial-gradient(var(--empty-dots) 1px, transparent 0);
-    background-size: 10px 10px;
-    opacity: 0.8;
-}
-
-.day-number { font-weight: bold; color: var(--text-color); opacity: 0.5; font-size: 0.85em; margin-bottom: 5px; }
 .today { background: var(--today-bg) !important; box-shadow: inset 0 0 0 2px var(--hfs-red); }
 
 .event-card { 
     background-color: var(--event-card-bg); padding: 8px; border-radius: 10px; 
     border: 1px solid var(--event-card-border); margin-bottom: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.event-title { font-weight: 800; color: var(--hfs-red); font-size: 0.85em; margin-bottom: 8px; display: block; }
-
-.participants-container { 
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 6px;
 }
 
 .person-tag { 
@@ -131,11 +107,102 @@ body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family
     font-size: 0.75em; font-weight: 600; display: flex; align-items: center; gap: 5px;
     border: 1px solid var(--border-color); color: var(--text-color);
     border-left: 4px solid #ccc;
-    white-space: nowrap;
 }
-.status-biztos { border-left-color: var(--status-biztos-border); }
-.status-talan { border-left-color: var(--status-talan-border); }
 
+/* --- LANDING PAGE (INDEX.HTML) SPECIFIKUS STÍLUSOK --- */
+
+.hero-section {
+    background: linear-gradient(var(--overlay), var(--overlay)), 
+                url('https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&q=80&w=2070'); 
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: var(--white);
+}
+
+.landing-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 50px;
+    z-index: 10;
+}
+
+.landing-nav .logo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--white);
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    color: var(--white);
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    transition: opacity 0.3s;
+}
+
+.landing-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 10%;
+    position: relative;
+}
+
+.main-text h1 {
+    font-size: 5rem;
+    line-height: 1.1;
+    margin: 0;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--white);
+}
+
+.cta-button {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 12px 30px;
+    border: 2px solid var(--white);
+    color: var(--white);
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    transition: all 0.3s;
+}
+
+.cta-button:hover {
+    background-color: var(--white);
+    color: #000;
+}
+
+.side-title {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 8rem;
+    font-weight: 900;
+    opacity: 0.2;
+    line-height: 0.8;
+    text-align: right;
+    pointer-events: none;
+    color: var(--white);
+}
+
+/* Sötét mód kapcsoló esztétikája */
 .theme-switch-wrapper { margin-top: auto; padding-top: 10px; display: flex; align-items: center; gap: 10px; font-size: 0.8em; font-weight: 600; }
 .theme-switch { position: relative; display: inline-block; width: 40px; height: 20px; }
 .theme-switch input { opacity: 0; width: 0; height: 0; }
@@ -143,3 +210,11 @@ body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family
 .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
 input:checked + .slider { background-color: var(--hfs-red); }
 input:checked + .slider:before { transform: translateX(20px); }
+
+/* Reszponzivitás */
+@media (max-width: 768px) {
+    .main-layout { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-color); }
+    .main-text h1 { font-size: 3rem; }
+    .side-title { display: none; }
+}
