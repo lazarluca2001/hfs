@@ -7,6 +7,10 @@
     --text-muted: #666;
     --border-color: #eee;
     --nav-bg: #ffffff;
+
+    --empty-day-fill: #f9f9f9;
+    --empty-dots: #e0e0e0;
+    --status-biztos-bg: #ffffff;
     
     --event-card-bg: #fff5f5;
     --event-card-border: #f0d0d0;
@@ -25,6 +29,10 @@
     --text-muted: #aaa;
     --border-color: #333;
     --nav-bg: #1e1e1e;
+
+    --empty-day-fill: #1a1a1a;
+    --empty-dots: #333333;
+    --status-biztos-bg: #2a2a2a;
     
     --event-card-bg: #2d1a1a;
     --event-card-border: #4a2a2a;
@@ -64,3 +72,4 @@ body {
 }
 input:checked + .slider { background-color: var(--hfs-red); }
 input:checked + .slider:before { transform: translateX(20px); }
+
