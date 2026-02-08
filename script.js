@@ -120,20 +120,29 @@ function updateActivityChart() {
 
 function updateNext() {
     const box = document.getElementById('nextEventContent');
-    if (!box) return;
+    if (!box || allEvents.length === 0) return;
     
+    // Aktuális időpont kérése és az idő lecsupaszítása (csak a nap számítson)
     const now = new Date();
     now.setHours(0, 0, 0, 0);
 
-    // Megkeressük a legközelebbi jövőbeli eseményt (ami még nem ért véget)
+    // Megkeressük a legközelebbi jövőbeli eseményt
     const upcoming = allEvents
-        .filter(e => e._end && e._end >= now)
+        .filter(e => {
+            if (!e._end) return false;
+            const eventEnd = new Date(e._end);
+            eventEnd.setHours(0, 0, 0, 0);
+            return eventEnd >= now;
+        })
         .sort((a, b) => a._start - b._start)[0];
 
     if (upcoming) {
-        // Napok kiszámítása
-        const diffTime = upcoming._start - now;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        // Dátumok normalizálása a pontos különbséghez
+        const startDate = new Date(upcoming._start);
+        startDate.setHours(0, 0, 0, 0);
+        
+        const diffTime = startDate.getTime() - now.getTime();
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
         
         let dayText = "";
         if (diffDays > 0) {
@@ -147,7 +156,7 @@ function updateNext() {
         box.innerHTML = `
             <div class="next-event-wrapper">
                 <div class="next-event-title">${upcoming.Event}</div>
-                <div class="next-event-info">📍 ${upcoming.Location || 'Ismeretlen'}</div>
+                <div class="next-event-info">📍 ${upcoming.Location || 'Praga'}</div>
                 <div class="next-event-info">🗓️ ${upcoming["Start date"]}</div>
                 <div class="next-event-countdown">${dayText}</div>
             </div>
@@ -217,4 +226,5 @@ document.addEventListener('DOMContentLoaded', () => {
         else sb.classList.toggle('collapsed');
     };
 });
+
 
