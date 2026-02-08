@@ -109,6 +109,12 @@ body, html {
     color: var(--hfs-red);
 }
 
+.member-filter {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
 /* Naptár rács és napok (3. kép elvárt állapota) */
 .month-display-container {
     display: flex;
@@ -240,3 +246,4 @@ input:checked + .slider:before { transform: translateX(22px); }
     .calendar-page .calendar-section { height: auto; }
     .side-title { display: none; }
 }
+
