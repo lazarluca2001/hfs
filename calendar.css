@@ -1,59 +1,57 @@
 /* --- ALAPOK ÉS GÖRDÜLÉS --- */
-body, html {
-    overflow-y: auto !important;
-    height: auto;
+html, body {
     margin: 0;
     padding: 0;
+    height: auto;
+    overflow-y: auto;
 }
 
-/* --- FIXÁLT BAL FELSŐ NAVIGÁCIÓ --- */
+/* --- FIX NAV --- */
 .fixed-nav {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%; /* Rugalmas szélesség */
+    width: 100%;
     height: 50px;
     background: var(--card-bg);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
-    box-sizing: border-box;
     border-bottom: 1px solid var(--border-color);
     z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .nav-left {
     display: flex;
-    align-items: center;
     gap: 15px;
+    align-items: center;
 }
 
 .filter-toggle-btn {
     background: var(--hfs-red);
-    color: white;
+    color: #fff;
     border: none;
     padding: 6px 12px;
     border-radius: 5px;
     font-size: 0.75em;
     font-weight: bold;
     cursor: pointer;
-    transition: background 0.2s;
 }
 
-.filter-toggle-btn:hover { background: #a00000; }
+.filter-toggle-btn:hover {
+    background: #a00000;
+}
 
-/* --- ELRENDEZÉS --- */
+/* --- LAYOUT --- */
 .calendar-page .main-layout {
     display: flex;
     min-height: 100vh;
-    padding-top: 50px; /* A fix nav miatt */
+    padding-top: 50px;
 }
 
 .calendar-page .sidebar {
     width: 320px;
-    min-width: 320px;
     background: var(--card-bg);
     padding: 20px;
     border-right: 1px solid var(--border-color);
@@ -61,15 +59,11 @@ body, html {
     flex-direction: column;
     gap: 15px;
     transition: all 0.3s ease;
-    z-index: 900;
 }
 
-/* BECSUKOTT OLDALSÁV WEBEN */
 .sidebar.collapsed {
     width: 0;
-    min-width: 0;
     padding: 0;
-    margin-left: -320px;
     overflow: hidden;
     border: none;
 }
@@ -80,7 +74,7 @@ body, html {
     padding: 20px;
 }
 
-/* --- TAGOK SZŰRÉSE --- */
+/* --- SZŰRŐK --- */
 .member-filter {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -90,63 +84,101 @@ body, html {
 .filter-btn {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    padding: 8px 4px;
+    padding: 8px 6px;
     border-radius: 6px;
-    color: var(--text-color);
-    font-weight: 600;
     font-size: 0.8em;
+    font-weight: 600;
+    cursor: pointer;
     display: flex;
-    align-items: center;
     justify-content: center;
     gap: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
 }
 
-.filter-btn.active { 
-    border-color: var(--hfs-red) !important;
-    background-color: var(--hfs-light-red) !important;
+.filter-btn.active {
+    border-color: var(--hfs-red);
+    background: var(--hfs-light-red);
     color: var(--hfs-red);
-    box-shadow: 0 0 0 1px var(--hfs-red);
 }
 
-/* --- DARK MODE KAPCSOLÓ (STABIL) --- */
-.theme-switch-wrapper { display: flex; align-items: center; }
-.theme-switch { position: relative; display: inline-block; width: 38px; height: 20px; }
-.theme-switch input { opacity: 0; width: 0; height: 0; }
+/* --- DARK MODE TOGGLE --- */
+.theme-switch {
+    position: relative;
+    width: 38px;
+    height: 20px;
+}
+
+.theme-switch input {
+    opacity: 0;
+}
+
 .theme-switch .slider {
-    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #eee !important; transition: .4s; border-radius: 20px;
-    border: 2px solid var(--hfs-red) !important; box-sizing: border-box;
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    border: 2px solid var(--hfs-red);
+    background: #eee;
 }
+
 .theme-switch .slider:before {
-    position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px;
-    background-color: var(--hfs-red); transition: .4s; border-radius: 50%; z-index: 5;
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    left: 2px;
+    bottom: 2px;
+    background: var(--hfs-red);
+    border-radius: 50%;
+    transition: 0.3s;
 }
-.theme-switch .slider::after { 
-    content: "🌙" !important; font-size: 9px; position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+
+.theme-switch input:checked + .slider:before {
+    transform: translateX(18px);
+    background: #fff;
 }
-[data-theme="dark"] .theme-switch .slider { background-color: #222 !important; }
-[data-theme="dark"] .theme-switch .slider::after { content: "☀️" !important; left: 4px; right: auto; }
-.theme-switch input:checked + .slider:before { transform: translateX(18px); background-color: #fff; }
 
-/* --- NAPTÁR RÁCS --- */
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--border-color); gap: 1px; }
-.day { background: var(--card-bg); padding: 8px; min-height: 120px; }
+/* --- NAPTÁR --- */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--border-color);
+}
 
-/* --- MOBIL ÉS TABLET NÉZET --- */
+.weekday {
+    background: var(--card-bg);
+    padding: 6px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.day {
+    background: var(--card-bg);
+    padding: 6px;
+    min-height: 110px;
+}
+
+.day-number {
+    font-size: 0.75em;
+    opacity: 0.6;
+}
+
+/* --- MOBIL --- */
 @media (max-width: 1024px) {
     .calendar-page .sidebar {
         position: fixed;
         top: 50px;
         left: 0;
-        height: calc(100vh - 50px);
         width: 100%;
+        height: calc(100vh - 50px);
         transform: translateX(-100%);
-        margin-left: 0;
-        overflow-y: auto;
+        z-index: 999;
     }
-    .calendar-page .sidebar.open { transform: translateX(0); }
-    .calendar-grid { grid-template-columns: repeat(7, minmax(100px, 1fr)); }
-    .calendar-section { overflow-x: auto; }
+
+    .calendar-page .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .calendar-section {
+        overflow-x: auto;
+    }
 }
