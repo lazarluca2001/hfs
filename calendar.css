@@ -6,7 +6,7 @@
     width: 320px; 
     height: 50px;
     background: var(--card-bg);
-    display: flex;
+    display: grid;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
@@ -90,7 +90,7 @@
 .slider {
     position: absolute; cursor: pointer;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #333; transition: .4s; border-radius: 20px;
+    background-color: var(--bg-color); transition: .4s; border-radius: 20px;
 }
 
 .slider:before {
@@ -114,7 +114,7 @@
     right: 22px; /* Elmozdítjuk, hogy ne takarja a fehér pötty */
 }
 
-input:checked + .slider { background-color: var(--hfs-red); }
+input:checked + .slider { background-color: #333; }
 input:checked + .slider:before { transform: translateX(20px); }
 
 /* --- SIDEBAR KÁRTYÁK --- */
@@ -219,3 +219,4 @@ input:checked + .slider:before { transform: translateX(20px); }
         height: auto;
     }
 }
+
