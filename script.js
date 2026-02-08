@@ -135,6 +135,56 @@ function updateNext() {
 }
 
 /**
+ * Időjárás adatok lekérése a helyszín alapján
+ */
+async function fetchWeather(city) {
+    const forecastDiv = document.getElementById('weatherForecast');
+    if (!city || !forecastDiv) return;
+
+    try {
+        // 1. Koordináták keresése a városhoz (Geocoding)
+        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=hu&format=json`);
+        const geoData = await geoRes.json();
+        
+        if (!geoData.results || geoData.results.length === 0) throw new Error("Város nem található");
+        const { latitude, longitude } = geoData.results[0];
+
+        // 2. 3 napos előrejelzés lekérése
+        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`);
+        const weatherData = await weatherRes.json();
+
+        forecastDiv.innerHTML = ''; 
+        
+        // Ikon választó segédfüggvény
+        const getWeatherIcon = (code) => {
+            if (code <= 3) return "☀️";
+            if (code <= 48) return "☁️";
+            if (code <= 67) return "🌧️";
+            if (code <= 77) return "❄️";
+            return "⛈️";
+        };
+
+        // Mai és a következő 2 nap megjelenítése
+        for (let i = 0; i < 3; i++) {
+            const dateLabel = i === 0 ? "Ma" : (i === 1 ? "Holnap" : "Utána");
+            const maxTemp = Math.round(weatherData.daily.temperature_2m_max[i]);
+            const minTemp = Math.round(weatherData.daily.temperature_2m_min[i]);
+            const icon = getWeatherIcon(weatherData.daily.weathercode[i]);
+
+            forecastDiv.innerHTML += `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 5px 8px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.9em;">
+                    <span style="font-weight: 600;">${dateLabel}</span>
+                    <span>${icon} ${maxTemp}° / ${minTemp}°</span>
+                </div>
+            `;
+        }
+    } catch (e) {
+        console.error("Időjárás hiba:", e);
+        forecastDiv.innerHTML = '<p style="color:var(--hfs-red); font-size:0.8em;">Időjárás nem elérhető.</p>';
+    }
+}
+
+/**
  * Kirajzolja a naptár rácsot az adott hónapra.
  */
 function render(m) {
@@ -243,4 +293,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initCalendar();
 });
+
 
