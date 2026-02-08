@@ -78,6 +78,9 @@ body, html {
     text-transform: uppercase;
 }
 
+.sidebar-card { background: var(--bg-color); border-radius: 12px; padding: 15px; border: 1px solid var(--border-color); }
+.sidebar-card h3 { margin: 0 0 10px 0; color: var(--hfs-red); font-size: 0.9em; text-transform: uppercase; }
+
 .calendar-page .calendar-section { 
     flex: 1; 
     height: 100vh; 
@@ -91,17 +94,17 @@ body, html {
 .filter-btn {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    padding: 10px 15px;
-    border-radius: 8px;
+    padding: 8px 5px;
+    border-radius: 6px;
     color: var(--text-color);
     font-weight: 600;
-    cursor: pointer;
-    font-size: 0.85em;
+    font-size: 0.8em;
     display: flex;
     align-items: center;
-    gap: 8px;
-    transition: all 0.2s ease;
+    justify-content: center;
+    gap: 4px;
 }
+
 
 .filter-btn.active { 
     border-color: var(--hfs-red); 
@@ -246,4 +249,5 @@ input:checked + .slider:before { transform: translateX(22px); }
     .calendar-page .calendar-section { height: auto; }
     .side-title { display: none; }
 }
+
 
