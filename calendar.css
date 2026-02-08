@@ -92,11 +92,11 @@
     margin-top: 0 !important; /* Felülírja a korábbi alsó elhelyezéshez szánt margót */
     padding-top: 0 !important;
 }
-.theme-switch { 
-    position: relative; 
-    display: inline-block; 
-    width: 50px; 
-    height: 25px; 
+.theme-switch { 
+    position: relative; 
+    display: inline-block; 
+    width: 36px;  /* 50-ről 36-ra csökkentve */
+    height: 18px; /* 25-ről 18-ra csökkentve */
 }
 .theme-switch input {
     opacity: 0;
@@ -104,49 +104,50 @@
     height: 0; }
 
 .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: var(--card-bg);
-    transition: .4s;
-    border-radius: 20px;
-    border: 2px solid var(--hfs-red); 
-    box-sizing: border-box;
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--card-bg);
+    transition: .4s;
+    border-radius: 20px;
+    /* VÉKONY HFS VÖRÖS BORDER */
+    border: 1px solid var(--hfs-red); 
+    box-sizing: border-box;
 }
 
 .slider:before {
-    position: absolute;
-    content: "";
-    height: 19px; /* Gomb magassága */
-    width: 19px;  /* Gomb szélessége */
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-    z-index: 2;
+    position: absolute;
+    content: "";
+    height: 12px; /* Gomb mérete csökkentve */
+    width: 12px;  
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--hfs-red); /* A gombot is vörösre állíthatod az összhangért */
+    transition: .4s;
+    border-radius: 50%;
+    z-index: 2;
 }
 
-.slider::after { 
-    content: "🌙"; 
-    font-size: 12px; 
-    position: absolute; 
-    right: 5px; 
-    top: 50%;
-    transform: translateY(-50%);
-    transition: 0.4s;
+.slider::after { 
+    content: "🌙"; 
+    font-size: 8px; /* Kisebb ikon */
+    position: absolute; 
+    right: 4px; 
+    top: 50%;
+    transform: translateY(-50%);
+    transition: 0.4s;
 }
 
 /* Nap ikon sötét módban */
-[data-theme="dark"] .slider::after { 
-    content: "☀️"; 
-    left: 5px;
-    right: auto;
+[data-theme="dark"] .slider::after { 
+    content: "☀️"; 
+    left: 4px;
+    right: auto;
 }
 
-input:checked + .slider { background-color: #333; }
+input:checked + .slider { background-color: var(--hfs-light-red); }
 input:checked + .slider:before {
-    transform: translateX(25px);
+    transform: translateX(18px);
 }
 
 /* --- SIDEBAR KÁRTYÁK --- */
@@ -251,6 +252,7 @@ input:checked + .slider:before {
         height: auto;
     }
 }
+
 
 
 
