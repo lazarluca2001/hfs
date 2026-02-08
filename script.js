@@ -3,19 +3,25 @@ const resztvevokMap = { "Csongi": "🌈", "Merci": "🦆", "Mózes": "🦄", "Lu
 const validStatuses = ["igen", "talán", "talan", "fizetve", "igazolt"];
 let allEvents = [], activeFilter = null, currentMonthIdx = new Date().getMonth();
 
-const toggle = document.querySelector('#checkbox');
+// --- KÖZÖS FUNKCIÓK (Landing Page és Naptár) ---
 
-// Sötét mód kezelése
-if (localStorage.getItem('theme') === 'dark') { 
-    document.documentElement.setAttribute('data-theme', 'dark'); 
-    toggle.checked = true; 
+function initTheme() {
+    const toggle = document.querySelector('#checkbox');
+    if (!toggle) return; // Ha a landing page-en nincs kapcsoló, ne fusson tovább
+
+    if (localStorage.getItem('theme') === 'dark') { 
+        document.documentElement.setAttribute('data-theme', 'dark'); 
+        toggle.checked = true; 
+    }
+
+    toggle.addEventListener('change', (e) => {
+        const t = e.target.checked ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', t);
+        localStorage.setItem('theme', t);
+    });
 }
 
-toggle.addEventListener('change', (e) => {
-    const t = e.target.checked ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', t);
-    localStorage.setItem('theme', t);
-});
+// --- NAPTÁR SPECIFIKUS FUNKCIÓK ---
 
 function parseHungarianDate(dStr) {
     if(!dStr) return null;
@@ -23,7 +29,10 @@ function parseHungarianDate(dStr) {
     return p.length < 3 ? null : new Date(p[0], p[1]-1, p[2]);
 }
 
-async function init() {
+async function initCalendar() {
+    // Csak akkor fut le, ha a naptár rács létezik az oldalon
+    if (!document.getElementById('calendar')) return;
+
     try {
         const res = await fetch(wishlistUrl);
         const csv = await res.text();
@@ -50,6 +59,8 @@ async function init() {
 
 function renderFilter() {
     const c = document.getElementById('memberFilter');
+    if (!c) return;
+    c.innerHTML = ''; // Meglévő gombok ürítése újragenerálás előtt
     Object.keys(resztvevokMap).forEach(name => {
         const btn = document.createElement('div');
         btn.className = 'filter-btn';
@@ -66,11 +77,14 @@ function renderFilter() {
 }
 
 function updateNext() {
+    const nextBox = document.getElementById('nextEventContent');
+    if (!nextBox) return;
+
     const now = new Date().setHours(0,0,0,0);
     const next = allEvents.filter(e => e._end && e._end >= now).sort((a,b) => a._start - b._start)[0];
     if(next) {
         const diff = Math.ceil((next._start - now) / 86400000);
-        document.getElementById('nextEventContent').innerHTML = `
+        nextBox.innerHTML = `
             <h2 style="font-size:1.1em; margin:0">${next.Event}</h2>
             <p style="margin:5px 0; font-size:0.9em; opacity:0.8">📍 ${next.Location || 'TBD'}</p>
             <p style="margin:5px 0; font-size:0.9em; opacity:0.8">📅 ${next["Start date"]}</p>
@@ -79,15 +93,11 @@ function updateNext() {
     }
 }
 
-function goToToday() {
-    currentMonthIdx = new Date().getMonth();
-    document.getElementById('monthSelect').value = currentMonthIdx;
-    render(currentMonthIdx);
-}
-
 function render(m) {
     const cal = document.getElementById('calendar'); 
+    if (!cal) return;
     cal.innerHTML = '';
+    
     const mNames = ["Január","Február","Március","Április","Május","Június","Július","Augusztus","Szeptember","Október","November","December"];
     document.getElementById('currentMonthHeader').innerText = mNames[m];
     
@@ -131,8 +141,17 @@ function render(m) {
     for(let i=0; i<remaining; i++) cal.innerHTML += `<div class="day empty-day-post"></div>`;
 }
 
+// Navigációs segédfunkciók
+function goToToday() {
+    currentMonthIdx = new Date().getMonth();
+    const sel = document.getElementById('monthSelect');
+    if (sel) sel.value = currentMonthIdx;
+    render(currentMonthIdx);
+}
+
 function setupMonthSelect() {
     const sel = document.getElementById('monthSelect'); 
+    if (!sel) return;
     sel.innerHTML = '';
     const mNames = ["Január","Február","Március","Április","Május","Június","Július","Augusztus","Szeptember","Október","November","December"];
     mNames.forEach((m, i) => {
@@ -150,9 +169,14 @@ function setupMonthSelect() {
 
 function changeMonth(d) { 
     currentMonthIdx = (currentMonthIdx + d + 12) % 12; 
-    document.getElementById('monthSelect').value = currentMonthIdx; 
+    const sel = document.getElementById('monthSelect');
+    if (sel) sel.value = currentMonthIdx; 
     render(currentMonthIdx); 
 }
 
-// Alkalmazás indítása
-init();
+// --- INDÍTÁS ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    initCalendar();
+});
