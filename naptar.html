@@ -25,6 +25,8 @@
 
 <div class="main-layout">
     <aside class="sidebar" id="sidebar">
+        <h1 class="sidebar-logo">HFS 2026</h1>
+        
         <div class="sidebar-card">
             <h3>KÖVETKEZŐ ÁLLOMÁS</h3>
             <div id="nextEventContent">Betöltés...</div>
@@ -43,14 +45,16 @@
 
     <main class="calendar-section">
         <div class="month-display-container">
-            <button class="nav-arrow" onclick="changeMonth(-1)">❮</button>
-            <h2 id="currentMonthHeader">FEBRUÁR</h2>
-            <button class="nav-arrow" onclick="changeMonth(1)">❯</button>
-        </div>
-        
-        <div class="quick-controls">
-            <button class="today-btn" onclick="goToToday()">Ma</button>
-            <select id="monthSelect" class="month-select"></select>
+            <div class="month-title-group">
+                <button class="nav-btn" onclick="changeMonth(-1)">❮</button>
+                <h2 id="currentMonthHeader" class="month-display">FEBRUÁR</h2>
+                <button class="nav-btn" onclick="changeMonth(1)">❯</button>
+            </div>
+            
+            <div class="controls-row">
+                <button class="today-btn" onclick="goToToday()">Ma</button>
+                <select id="monthSelect" class="month-select"></select>
+            </div>
         </div>
 
         <div id="calendar" class="calendar-grid"></div>
