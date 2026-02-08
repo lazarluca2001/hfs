@@ -1,3 +1,22 @@
+/* --- FIXÁLT BAL FELSŐ NAVIGÁCIÓ --- */
+.fixed-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 320px; 
+    height: 50px;
+    background: var(--card-bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-sizing: border-box;
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
 /* --- NAPTÁR OLDAL ELRENDEZÉS --- */
 .calendar-page .main-layout { 
     display: flex; 
@@ -9,7 +28,7 @@
     width: 320px;
     min-width: 320px;
     background: var(--card-bg);
-    padding: 20px;
+    padding: 70px 20px 20px 20px;
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
@@ -17,7 +36,6 @@
     height: 100vh;
     box-sizing: border-box;
     z-index: 10;
-    /* GÖRDÜLHETŐ SIDEBAR */
     overflow-y: auto;
 }
 
@@ -26,14 +44,34 @@
 .sidebar::-webkit-scrollbar-track { background: transparent; }
 .sidebar::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
 
-/* --- FELSŐ NAVIGÁCIÓ (Vissza + Dark Mode) --- */
-.sidebar-top-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 5px;
+/* --- TAGOK SZŰRÉSE JAVÍTÁSA --- */
+.member-filter {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Két egyenlő oszlop */
+    gap: 8px;
+    width: 100%;
 }
 
+.filter-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 8px 4px;
+    border-radius: 6px;
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    white-space: nowrap; /* Ne törje meg a nevet */
+    width: 100%;        /* Kitölti a grid cellát */
+    box-sizing: border-box;
+    transition: all 0.2s;
+}
+
+/* --- FELSŐ NAVIGÁCIÓ (Vissza + Dark Mode) --- */
 .sidebar-link {
     text-decoration: none;
     color: var(--hfs-red);
@@ -53,7 +91,6 @@
     position: absolute; cursor: pointer;
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: #333; transition: .4s; border-radius: 20px;
-    display: flex; align-items: center; justify-content: space-between; padding: 0 5px;
 }
 
 .slider:before {
@@ -62,9 +99,20 @@
     background-color: white; transition: .4s; border-radius: 50%; z-index: 2;
 }
 
-/* Nap és Hold ikonok a háttérben */
-.slider::after { content: "☀️"; font-size: 10px; margin-left: auto; }
-.slider::after { content: "🌙"; font-size: 10px; }
+.slider::after { 
+    content: "🌙"; 
+    font-size: 10px; 
+    position: absolute; 
+    right: 6px; 
+    top: 4px; 
+    transition: 0.4s;
+}
+
+/* Nap ikon sötét módban */
+[data-theme="dark"] .slider::after { 
+    content: "☀️"; 
+    right: 22px; /* Elmozdítjuk, hogy ne takarja a fehér pötty */
+}
 
 input:checked + .slider { background-color: var(--hfs-red); }
 input:checked + .slider:before { transform: translateX(20px); }
@@ -161,6 +209,13 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 /* --- MOBIL NÉZET --- */
 @media (max-width: 768px) {
-    .calendar-page .main-layout { flex-direction: column; overflow: auto; }
-    .calendar-page .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-color); }
+    .fixed-nav {
+        width: 100%; /* Mobilon töltse ki a szélességet */
+        position: sticky; /* Ne takarja el a naptárat görgetéskor, ha nem akarod */
+    }
+    .calendar-page .sidebar {
+        width: 100%;
+        padding-top: 20px; /* Mobilon nincs szükség a nagy felső paddingre, ha sticky */
+        height: auto;
+    }
 }
