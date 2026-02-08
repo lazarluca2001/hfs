@@ -33,18 +33,37 @@ async function initCalendar() {
     try {
         const res = await fetch(wishlistUrl);
         const csv = await res.text();
-        const rows = csv.split('\n').map(r => r.split(',').map(c => c.replace(/"/g, '').trim()));
 
-        const headers = rows[3];
-        for (let i = 4; i < rows.length; i++) {
+        const rows = csv
+            .split('\n')
+            .map(r => r.split(',').map(c => c.replace(/"/g, '').trim()))
+            .filter(r => r.length > 1);
+
+        // 🔍 FEJLÉC KERESÉSE
+        const headerRowIndex = rows.findIndex(r => r.includes('Event'));
+        if (headerRowIndex === -1) {
+            console.error("Nincs Event fejléc a CSV-ben");
+            return;
+        }
+
+        const headers = rows[headerRowIndex];
+
+        for (let i = headerRowIndex + 1; i < rows.length; i++) {
+            const row = rows[i];
             const obj = {};
-            headers.forEach((h, idx) => h && (obj[h] = rows[i][idx]));
+
+            headers.forEach((h, idx) => {
+                if (h && row[idx]) obj[h] = row[idx];
+            });
+
             if (obj.Event) {
                 obj._start = parseDate(obj["Start date"]);
                 obj._end = parseDate(obj["End date"]);
                 if (obj._start) allEvents.push(obj);
             }
         }
+
+        console.log("BETÖLTÖTT ESEMÉNYEK:", allEvents);
 
         renderFilter();
         setupMonthSelect();
@@ -59,8 +78,24 @@ async function initCalendar() {
 
 function parseDate(d) {
     if (!d) return null;
-    const p = d.replace('.', '').split('.');
-    return p.length === 3 ? new Date(p[0], p[1] - 1, p[2]) : null;
+
+    const clean = d.toString().trim().replace(/\.$/, '');
+
+    // yyyy-mm-dd
+    if (clean.includes('-')) {
+        const dt = new Date(clean);
+        return isNaN(dt) ? null : dt;
+    }
+
+    // yyyy.mm.dd
+    const p = clean.split('.');
+    if (p.length !== 3) return null;
+
+    return new Date(
+        parseInt(p[0]),
+        parseInt(p[1]) - 1,
+        parseInt(p[2])
+    );
 }
 
 /* --- FILTER --- */
@@ -134,3 +169,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.querySelector('.sidebar');
     btn.onclick = () => sidebar.classList.toggle(window.innerWidth <= 1024 ? 'open' : 'collapsed');
 });
+
