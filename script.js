@@ -91,13 +91,13 @@ function renderFilter() {
         
         btn.innerHTML = `<span>${resztvevokMap[name]}</span> ${name}`;
         btn.onclick = () => {
-            activeFilter = (activeFilter === name) ? null : name;
-            // Gombok vizuális frissítése
-            document.querySelectorAll('.filter-btn').forEach(b => {
-                b.classList.toggle('active', b.innerText.includes(activeFilter) && activeFilter !== null);
-            });
-            render(currentMonthIdx);
-        };
+    activeFilter = (activeFilter === name) ? null : name;
+    document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.toggle('active', b.innerText.includes(activeFilter) && activeFilter !== null);
+    });
+    
+    render(currentMonthIdx);
+};
         c.appendChild(btn);
     });
 }
@@ -340,4 +340,5 @@ function updateActivityChart() {
         chartContainer.appendChild(createColumn(stats[name], resztvevokMap[name], stats[name]));
     });
 }
+
 
