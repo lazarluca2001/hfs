@@ -71,6 +71,13 @@
     transition: all 0.2s;
 }
 
+.filter-btn.active { 
+    border-color: var(--hfs-red) !important;
+    background-color: var(--hfs-light-red) !important;
+    color: var(--hfs-red);
+    box-shadow: 0 0 0 1px var(--hfs-red);
+}
+
 /* --- FELSŐ NAVIGÁCIÓ (Vissza + Dark Mode) --- */
 .sidebar-link {
     text-decoration: none;
@@ -263,5 +270,6 @@
         height: auto;
     }
 }
+
 
 
