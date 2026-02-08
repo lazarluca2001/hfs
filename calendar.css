@@ -96,8 +96,15 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 /* --- ELRENDEZÉS (LAYOUT) --- */
 .calendar-page .main-layout {
-    display: flex; padding-top: 50px;
-    min-height: 100vh; width: 100vw; overflow-y: auto;
+    display: flex;
+    padding-top: 50px;
+    min-height: 100vh;
+    width: 100vw;
+}
+
+body.calendar-page {
+    overflow-y: auto !important;
+    height: auto;
 }
 
 /* SIDEBAR */
@@ -147,13 +154,13 @@ input:checked + .slider:before { transform: translateX(20px); }
 .chart-emoji { margin-top: 8px; font-size: 1.1em; }
 
 /* --- NAPTÁR SZEKCIÓ --- */
-.calendar-section {
-    flex: 1;
-    min-height: calc(100vh - 50px);
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-color);
-    overflow: visible; }
+.calendar-section { 
+    flex: 1; 
+    min-height: calc(100vh - 50px); 
+    display: flex; 
+    flex-direction: column; 
+    background: var(--bg-color); 
+}
 
 .month-display-container {
     display: flex; flex-direction: column; align-items: center;
@@ -175,7 +182,12 @@ input:checked + .slider:before { transform: translateX(20px); }
     background: var(--border-color);
     gap: 1px;
     width: 100%;
-    margin-bottom: 20px;
+}
+
+.calendar-footer-spacer {
+    height: 100px;
+    width: 100%;
+    background: transparent;
 }
 
 .weekday {
@@ -260,6 +272,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     .calendar-grid { grid-template-columns: repeat(7, minmax(130px, 1fr)); }
     .calendar-section { overflow-x: auto; }
 }
+
 
 
 
