@@ -86,7 +86,12 @@ function render(m) {
         const currDate = new Date(2026, m, d);
         const currTimestamp = currDate.setHours(0,0,0,0);
         const todayTimestamp = new Date().setHours(0,0,0,0);
-        const dailyEvents = allEvents.filter(e => currTimestamp >= e._start.getTime() && currTimestamp <= e._end.getTime());
+        
+        const dailyEvents = allEvents.filter(e => {
+            const start = new Date(e._start).setHours(0,0,0,0);
+            const end = e._end ? new Date(e._end).setHours(0,0,0,0) : start;
+            return currTimestamp >= start && currTimestamp <= end;
+        });
 
         const dayDiv = document.createElement('div');
         dayDiv.className = `day ${todayTimestamp === currTimestamp ? 'today' : ''}`;
@@ -96,9 +101,12 @@ function render(m) {
             let tags = "";
             Object.keys(resztvevokMap).forEach(name => {
                 const status = (e[name] || "").toLowerCase();
-                if (validStatuses.some(vs => status.includes(vs)) && (!activeFilter || activeFilter === name)) {
-                    const isTalan = status.includes("talan") || status.includes("talán");
-                    tags += `<div class="person-tag ${isTalan ? 'status-talan' : 'status-biztos'}"><span>${resztvevokMap[name]}</span> ${name}</div>`;
+                if (validStatuses.some(vs => status.includes(vs))) {
+                    // Ha van aktív szűrő, csak azt a személyt mutassuk
+                    if (!activeFilter || activeFilter === name) {
+                        const isTalan = status.includes("talan") || status.includes("talán");
+                        tags += `<div class="person-tag ${isTalan ? 'status-talan' : 'status-biztos'}"><span>${resztvevokMap[name]}</span> ${name}</div>`;
+                    }
                 }
             });
 
@@ -106,22 +114,29 @@ function render(m) {
                 const eventCard = document.createElement('div');
                 eventCard.className = 'event-card';
                 eventCard.innerHTML = `<span class="event-title">${e.Event}</span><div class="participants-container">${tags}</div>`;
-                
-                // A kattintás eseménykezelőt töröltük, mivel fixen látszani fog minden
                 dayDiv.appendChild(eventCard);
             }
+        });
+        cal.appendChild(dayDiv);
+    }
+}
 
 /* --- FUNKCIÓK --- */
 function updateActivityChart() {
     const container = document.getElementById('activityChart');
     if (!container || allEvents.length === 0) return;
+    
     container.innerHTML = Object.keys(resztvevokMap).map(name => {
         const count = allEvents.filter(e => {
             const s = (e[name] || "").toLowerCase();
             return validStatuses.some(vs => s.includes(vs));
         }).length;
         const height = (count / allEvents.length) * 70;
-        return `<div class="chart-column-wrapper"><span class="chart-label">${count}</span><div class="chart-bar" style="height:${height}px"></div><span class="chart-emoji">${resztvevokMap[name]}</span></div>`;
+        return `<div class="chart-column-wrapper">
+                    <span class="chart-label">${count}</span>
+                    <div class="chart-bar" style="height:${height}px"></div>
+                    <span class="chart-emoji">${resztvevokMap[name]}</span>
+                </div>`;
     }).join('');
 }
 
@@ -134,8 +149,7 @@ function updateNext() {
 
     const upcoming = allEvents
         .filter(e => {
-            if (!e._end) return false;
-            const eventEnd = new Date(e._end);
+            const eventEnd = e._end ? new Date(e._end) : new Date(e._start);
             eventEnd.setHours(0, 0, 0, 0);
             return eventEnd >= now;
         })
@@ -219,10 +233,15 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initCalendar();
 
-    document.getElementById('sidebarToggle').addEventListener('click', () => {
-        const sb = document.getElementById('sidebar');
-        if (window.innerWidth <= 1024) sb.classList.toggle('open');
-        else sb.classList.toggle('collapsed');
-    });
+    const toggleBtn = document.getElementById('sidebarToggle');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            const sb = document.getElementById('sidebar');
+            if (window.innerWidth <= 1024) {
+                sb.classList.toggle('open');
+            } else {
+                sb.classList.toggle('collapsed');
+            }
+        });
+    }
 });
-
