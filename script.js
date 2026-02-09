@@ -107,26 +107,9 @@ function render(m) {
                 eventCard.className = 'event-card';
                 eventCard.innerHTML = `<span class="event-title">${e.Event}</span><div class="participants-container">${tags}</div>`;
                 
-                // Mobil lenyitás logikája (biztonságos eseménykezelővel)
-                eventCard.addEventListener('click', (ev) => {
-                    ev.stopPropagation();
-                    eventCard.classList.toggle('expanded');
-                });
-                
+                // A kattintás eseménykezelőt töröltük, mivel fixen látszani fog minden
                 dayDiv.appendChild(eventCard);
             }
-        });
-        cal.appendChild(dayDiv);
-    }
-
-    const totalCells = first + days;
-    const remaining = (7 - (totalCells % 7)) % 7;
-    for (let i = 0; i < remaining; i++) {
-        const div = document.createElement('div');
-        div.className = 'day empty-day-post';
-        cal.appendChild(div);
-    }
-}
 
 /* --- FUNKCIÓK --- */
 function updateActivityChart() {
@@ -242,3 +225,4 @@ document.addEventListener('DOMContentLoaded', () => {
         else sb.classList.toggle('collapsed');
     });
 });
+
