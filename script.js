@@ -93,7 +93,6 @@ function render(m) {
             });
 
             if (tags) {
-                // Hozzáadtuk az onclick eseményt: rákattintáskor hozzáad/elvesz egy 'expanded' osztályt
                 html += `
                     <div class="event-card" onclick="this.classList.toggle('expanded')">
                         <span class="event-title">${e.Event}</span>
@@ -101,11 +100,13 @@ function render(m) {
                     </div>`;
             }
         });
+        cal.innerHTML += html + `</div>`;
+    }
 
     const totalCells = first + days;
     const remaining = (7 - (totalCells % 7)) % 7;
     for (let i = 0; i < remaining; i++) cal.innerHTML += `<div class="day empty-day-post"></div>`;
-}
+} // <--- EZ A KAPCSOS ZÁRÓJEL HIÁNYZOTT!
 
 /* --- FUNKCIÓK --- */
 function updateActivityChart() {
@@ -125,11 +126,9 @@ function updateNext() {
     const box = document.getElementById('nextEventContent');
     if (!box || allEvents.length === 0) return;
     
-    // Aktuális időpont kérése és az idő lecsupaszítása (csak a nap számítson)
     const now = new Date();
     now.setHours(0, 0, 0, 0);
 
-    // Megkeressük a legközelebbi jövőbeli eseményt
     const upcoming = allEvents
         .filter(e => {
             if (!e._end) return false;
@@ -140,7 +139,6 @@ function updateNext() {
         .sort((a, b) => a._start - b._start)[0];
 
     if (upcoming) {
-        // Dátumok normalizálása a pontos különbséghez
         const startDate = new Date(upcoming._start);
         startDate.setHours(0, 0, 0, 0);
         
@@ -159,7 +157,7 @@ function updateNext() {
         box.innerHTML = `
             <div class="next-event-wrapper">
                 <div class="next-event-title">${upcoming.Event}</div>
-                <div class="next-event-info">📍 ${upcoming.Location || 'Praga'}</div>
+                <div class="next-event-info">📍 ${upcoming.Location || 'Ismeretlen'}</div>
                 <div class="next-event-info">🗓️ ${upcoming["Start date"]}</div>
                 <div class="next-event-countdown">${dayText}</div>
             </div>
@@ -229,6 +227,3 @@ document.addEventListener('DOMContentLoaded', () => {
         else sb.classList.toggle('collapsed');
     };
 });
-
-
-
