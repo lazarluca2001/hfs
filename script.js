@@ -131,12 +131,16 @@ function updateActivityChart() {
             const s = (e[name] || "").toLowerCase();
             return validStatuses.some(vs => s.includes(vs));
         }).length;
-        const height = (count / allEvents.length) * 70;
-        return `<div class="chart-column-wrapper">
-                    <span class="chart-label">${count}</span>
-                    <div class="chart-bar" style="height:${height}px"></div>
-                    <span class="chart-emoji">${resztvevokMap[name]}</span>
-                </div>`;
+        
+        // Magasság számítása (max 80px, hogy maradjon hely az emojinak és számnak)
+        const height = (count / allEvents.length) * 80;
+        
+        return `
+            <div class="chart-column-wrapper">
+                <span class="chart-emoji">${resztvevokMap[name]}</span>
+                <div class="chart-bar" style="height:${height}px"></div>
+                <span class="chart-label">${count}</span>
+            </div>`;
     }).join('');
 }
 
@@ -245,3 +249,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
