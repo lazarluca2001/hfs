@@ -106,7 +106,7 @@ function render(m) {
     const totalCells = first + days;
     const remaining = (7 - (totalCells % 7)) % 7;
     for (let i = 0; i < remaining; i++) cal.innerHTML += `<div class="day empty-day-post"></div>`;
-} // <--- EZ A KAPCSOS ZÁRÓJEL HIÁNYZOTT!
+}
 
 /* --- FUNKCIÓK --- */
 function updateActivityChart() {
@@ -192,13 +192,15 @@ function setupMonthSelect() {
 
 window.changeMonth = (d) => {
     currentMonthIdx = (currentMonthIdx + d + 12) % 12;
-    document.getElementById('monthSelect').value = currentMonthIdx;
+    const select = document.getElementById('monthSelect');
+    if (select) select.value = currentMonthIdx;
     render(currentMonthIdx);
 }
 
 window.goToToday = () => {
     currentMonthIdx = new Date().getMonth();
-    document.getElementById('monthSelect').value = currentMonthIdx;
+    const select = document.getElementById('monthSelect');
+    if (select) select.value = currentMonthIdx;
     render(currentMonthIdx);
 }
 
