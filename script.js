@@ -66,12 +66,21 @@ function render(m) {
     const months = ["JANUÁR","FEBRUÁR","MÁRCIUS","ÁPRILIS","MÁJUS","JÚNIUS","JÚLIUS","AUGUSZTUS","SZEPTEMBER","OKTÓBER","NOVEMBER","DECEMBER"];
     document.getElementById('currentMonthHeader').innerText = months[m];
 
-    ["H","K","Sze","Cs","P","Szo","V"].forEach(d => cal.innerHTML += `<div class="weekday">${d}</div>`);
+    ["H","K","Sze","Cs","P","Szo","V"].forEach(d => {
+        const div = document.createElement('div');
+        div.className = 'weekday';
+        div.innerText = d;
+        cal.appendChild(div);
+    });
 
     const first = (new Date(2026, m, 1).getDay() + 6) % 7;
     const days = new Date(2026, m + 1, 0).getDate();
 
-    for (let i = 0; i < first; i++) cal.innerHTML += `<div class="day empty-day-pre"></div>`;
+    for (let i = 0; i < first; i++) {
+        const div = document.createElement('div');
+        div.className = 'day empty-day-pre';
+        cal.appendChild(div);
+    }
 
     for (let d = 1; d <= days; d++) {
         const currDate = new Date(2026, m, d);
@@ -79,8 +88,9 @@ function render(m) {
         const todayTimestamp = new Date().setHours(0,0,0,0);
         const dailyEvents = allEvents.filter(e => currTimestamp >= e._start.getTime() && currTimestamp <= e._end.getTime());
 
-        let html = `<div class="day ${todayTimestamp === currTimestamp ? 'today' : ''}">
-                    <span class="day-number">${d}</span>`;
+        const dayDiv = document.createElement('div');
+        dayDiv.className = `day ${todayTimestamp === currTimestamp ? 'today' : ''}`;
+        dayDiv.innerHTML = `<span class="day-number">${d}</span>`;
 
         dailyEvents.forEach(e => {
             let tags = "";
@@ -93,19 +103,29 @@ function render(m) {
             });
 
             if (tags) {
-                html += `
-                    <div class="event-card" onclick="this.classList.toggle('expanded')">
-                        <span class="event-title">${e.Event}</span>
-                        <div class="participants-container">${tags}</div>
-                    </div>`;
+                const eventCard = document.createElement('div');
+                eventCard.className = 'event-card';
+                eventCard.innerHTML = `<span class="event-title">${e.Event}</span><div class="participants-container">${tags}</div>`;
+                
+                // Mobil lenyitás logikája (biztonságos eseménykezelővel)
+                eventCard.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    eventCard.classList.toggle('expanded');
+                });
+                
+                dayDiv.appendChild(eventCard);
             }
         });
-        cal.innerHTML += html + `</div>`;
+        cal.appendChild(dayDiv);
     }
 
     const totalCells = first + days;
     const remaining = (7 - (totalCells % 7)) % 7;
-    for (let i = 0; i < remaining; i++) cal.innerHTML += `<div class="day empty-day-post"></div>`;
+    for (let i = 0; i < remaining; i++) {
+        const div = document.createElement('div');
+        div.className = 'day empty-day-post';
+        cal.appendChild(div);
+    }
 }
 
 /* --- FUNKCIÓK --- */
@@ -145,14 +165,7 @@ function updateNext() {
         const diffTime = startDate.getTime() - now.getTime();
         const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
         
-        let dayText = "";
-        if (diffDays > 0) {
-            dayText = `Még ${diffDays} nap`;
-        } else if (diffDays === 0) {
-            dayText = "Ma kezdődik! 🔥";
-        } else {
-            dayText = "Folyamatban... 🚀";
-        }
+        let dayText = (diffDays > 0) ? `Még ${diffDays} nap` : (diffDays === 0 ? "Ma kezdődik! 🔥" : "Folyamatban... 🚀");
 
         box.innerHTML = `
             <div class="next-event-wrapper">
@@ -160,8 +173,7 @@ function updateNext() {
                 <div class="next-event-info">📍 ${upcoming.Location || 'Ismeretlen'}</div>
                 <div class="next-event-info">🗓️ ${upcoming["Start date"]}</div>
                 <div class="next-event-countdown">${dayText}</div>
-            </div>
-        `;
+            </div>`;
     } else {
         box.innerHTML = "<div class='next-event-info'>Nincs következő esemény.</div>";
     }
@@ -170,16 +182,18 @@ function updateNext() {
 function renderFilter() {
     const box = document.getElementById('memberFilter');
     if (!box) return;
-    box.innerHTML = Object.keys(resztvevokMap).map(n => `
-        <div class="filter-btn ${activeFilter === n ? 'active' : ''}" onclick="toggleFilter('${n}')">
-            <span>${resztvevokMap[n]}</span> ${n}
-        </div>`).join('');
-}
-
-window.toggleFilter = (name) => {
-    activeFilter = activeFilter === name ? null : name;
-    renderFilter();
-    render(currentMonthIdx);
+    box.innerHTML = '';
+    Object.keys(resztvevokMap).forEach(n => {
+        const btn = document.createElement('div');
+        btn.className = `filter-btn ${activeFilter === n ? 'active' : ''}`;
+        btn.innerHTML = `<span>${resztvevokMap[n]}</span> ${n}`;
+        btn.addEventListener('click', () => {
+            activeFilter = activeFilter === n ? null : n;
+            renderFilter();
+            render(currentMonthIdx);
+        });
+        box.appendChild(btn);
+    });
 }
 
 function setupMonthSelect() {
@@ -218,14 +232,13 @@ function initTheme() {
     };
 }
 
-/* --- INICIALIZÁLÁS --- */
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initCalendar();
 
-    document.getElementById('sidebarToggle').onclick = () => {
+    document.getElementById('sidebarToggle').addEventListener('click', () => {
         const sb = document.getElementById('sidebar');
         if (window.innerWidth <= 1024) sb.classList.toggle('open');
         else sb.classList.toggle('collapsed');
-    };
+    });
 });
