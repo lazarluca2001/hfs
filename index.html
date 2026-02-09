@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HFS | WSDC Kalkulátor</title>
+    <title>HFS | WSDC Dinamikus Kalkulátor</title>
     <style>
-        /* --- VÁLTOZÓK ÉS TÉMÁK --- */
+        /* --- VÁLTOZÓK ÉS TÉMÁK (HFS STÍLUS) --- */
         :root {
             --hfs-red: #800000;
             --hfs-red-hover: #a00000;
@@ -31,32 +31,23 @@
             --shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
-        /* --- ALAPVETŐ BEÁLLÍTÁSOK --- */
         * { box-sizing: border-box; }
         body {
-            margin: 0;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            margin: 0; font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color); color: var(--text-color);
             transition: background 0.3s, color 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
 
-        /* --- FIX NAVIGÁCIÓ --- */
+        /* FIX NAV */
         .fixed-nav {
             position: fixed; top: 0; left: 0; right: 0; height: 50px;
             background: var(--nav-bg); border-bottom: 1px solid var(--border-color);
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; z-index: 1100; box-shadow: var(--shadow);
         }
-        .nav-left { display: flex; align-items: center; gap: 15px; }
-        .back-link { text-decoration: none; color: var(--hfs-red); font-weight: bold; font-size: 0.9em; }
-        
+
         /* Theme Switch */
-        .theme-wrap { display: flex; align-items: center; gap: 10px; font-size: 0.8em; font-weight: bold; }
         .theme-switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .theme-switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
@@ -64,92 +55,24 @@
         input:checked + .slider { background-color: var(--hfs-red); }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        /* --- TARTALOM --- */
-        .container {
-            margin-top: 80px;
-            width: 95%;
-            max-width: 600px;
-            padding-bottom: 50px;
-        }
+        .container { margin-top: 80px; width: 95%; max-width: 600px; padding-bottom: 50px; }
+        .sidebar-logo { color: var(--hfs-red); font-size: 1.8em; margin-bottom: 20px; font-weight: 900; text-transform: uppercase; text-align: center; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 25px; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
+        
+        label { display: block; margin-top: 15px; font-weight: bold; font-size: 0.8em; color: var(--hfs-red); text-transform: uppercase; }
+        select, input { padding: 12px; margin: 8px 0; width: 100%; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1em; font-weight: 600; }
 
-        .sidebar-logo { 
-            color: var(--hfs-red); 
-            font-size: 1.8em; 
-            margin-bottom: 20px; 
-            font-weight: 900; 
-            text-transform: uppercase;
-            text-align: center;
-        }
-
-        .card { 
-            background: var(--card-bg); 
-            border-radius: 16px; 
-            padding: 25px; 
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-        }
-
-        .sidebar-card h3 { 
-            margin: 0 0 15px 0; 
-            color: var(--hfs-red); 
-            font-size: 1em; 
-            text-transform: uppercase; 
-            letter-spacing: 1px;
-        }
-
-        label { 
-            display: block; 
-            margin-top: 20px; 
-            font-weight: bold; 
-            font-size: 0.85em;
-            color: var(--text-muted);
-        }
-
-        select, input { 
-            padding: 12px; 
-            margin: 8px 0; 
-            width: 100%; 
-            border: 1px solid var(--border-color); 
-            border-radius: 8px; 
-            background: var(--bg-color);
-            color: var(--text-color);
-            font-size: 1em;
-            font-weight: 600;
-        }
-
-        /* --- EREDMÉNYEK --- */
-        .result-group {
-            margin-top: 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .result-box {
-            padding: 15px;
-            border-radius: 12px;
-            border-left: 5px solid var(--hfs-red);
-        }
-
-        .next-level-box { background: var(--hfs-light-red); }
-        .allstar-box { background: var(--bg-color); border-left-color: var(--text-color); }
-
+        .result-box { margin-top: 20px; padding: 15px; border-radius: 12px; border-left: 5px solid var(--hfs-red); background: var(--hfs-light-red); }
         .highlight { font-weight: 800; color: var(--hfs-red); font-size: 1.1em; }
-        .small-hint { font-size: 0.85em; color: var(--text-muted); margin-top: 8px; display: block; }
-
-        @media (max-width: 600px) {
-            .container { width: 90%; }
-        }
+        .allstar-box { background: var(--bg-color); border-left-color: var(--text-color); margin-top: 10px; }
     </style>
 </head>
-<body class="calendar-page">
+<body>
 
 <nav class="fixed-nav">
-    <div class="nav-left">
-        <a href="#" class="back-link">HFS DASHBOARD</a>
-    </div>
-    <div class="theme-wrap">
-        <span>DARK MODE</span>
+    <div style="font-weight: bold; color: var(--hfs-red);">HFS DASHBOARD</div>
+    <div style="display: flex; align-items: center; gap: 10px; font-size: 0.8em;">
+        <span>SÖTÉT MÓD</span>
         <label class="theme-switch">
             <input type="checkbox" id="theme-toggle">
             <span class="slider"></span>
@@ -158,24 +81,28 @@
 </nav>
 
 <div class="container">
-    <div class="sidebar-logo">WSDC Kalkulátor</div>
+    <div class="sidebar-logo">All Star Kalkulátor</div>
 
-    <div class="card sidebar-card">
-        <h3>Versenyzői Adatok</h3>
-        
-        <label for="currentDivision">JELENLEGI DIVÍZIÓ</label>
+    <div class="card">
+        <label for="memberSelect">TAG KIVÁLASZTÁSA (AUTOMATIKUS KITÖLTÉS)</label>
+        <select id="memberSelect" onchange="loadMemberData()">
+            <option value="custom">-- Egyéni pont megadása --</option>
+            </select>
+
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
+
+        <label for="currentDivision">AKTUÁLIS DIVÍZIÓ</label>
         <select id="currentDivision" onchange="calculate()">
             <option value="Newcomer">Newcomer</option>
             <option value="Novice">Novice</option>
             <option value="Intermediate">Intermediate</option>
             <option value="Advanced">Advanced</option>
-            <option value="All Star">All Star</option>
         </select>
 
-        <label for="currentPoints">PONTOK SZÁMA (AKTUÁLIS SZINTEN)</label>
-        <input type="number" id="currentPoints" value="0" min="0" oninput="calculate()">
+        <label for="currentPoints">PONTOK AZ AKTUÁLIS SZINTEN</label>
+        <input type="number" id="currentPoints" value="0" oninput="calculate()">
 
-        <label for="targetTier">KÖVETKEZŐ VERSENY MÉRETE (TIER)</label>
+        <label for="targetTier">KÖVETKEZŐ VERSENY (TIER)</label>
         <select id="targetTier" onchange="calculate()">
             <option value="1">Tier 1 (5-10 pár)</option>
             <option value="2">Tier 2 (11-19 pár)</option>
@@ -185,27 +112,26 @@
             <option value="6">Tier 6 (130+ pár)</option>
         </select>
 
-        <div class="result-group">
-            <div id="nextLevelResult" class="result-box next-level-box"></div>
-            <div id="allStarResult" class="result-box allstar-box"></div>
-        </div>
+        <div id="nextLevelResult" class="result-box"></div>
+        <div id="allStarResult" class="result-box allstar-box"></div>
     </div>
 </div>
 
 <script>
-    /* --- TÉMA KEZELÉS --- */
-    const themeToggle = document.getElementById('theme-toggle');
-    themeToggle.addEventListener('change', () => {
-        document.documentElement.setAttribute('data-theme', themeToggle.checked ? 'dark' : 'light');
-    });
+    // --- ADATBÁZIS A CSV ALAPJÁN (Ezt kell frissítened, ha változnak a pontok) ---
+    const hfsData = [
+        { name: "Ferenczi Csongor", div: "Intermediate", points: 19 },
+        { name: "Bende Márton", div: "Novice", points: 15 },
+        { name: "Angyal Mercédesz", div: "Novice", points: 4 },
+        { name: "Lázár Luca", div: "Novice", points: 0 },
+        { name: "Dominguez Zoltán", div: "Novice", points: 0 }
+    ];
 
-    /* --- KALKULÁCIÓS LOGIKA --- */
     const rules = {
-        "Newcomer": { next: "Novice", allowed: 0, required: 1 },
-        "Novice": { next: "Intermediate", allowed: 16, required: 30 },
-        "Intermediate": { next: "Advanced", allowed: 30, required: 45 },
-        "Advanced": { next: "All Star", allowed: 60, required: 90 },
-        "All Star": { next: "Champion", allowed: 150, required: 225 }
+        "Newcomer": { allowed: 0, required: 1, next: "Novice" },
+        "Novice": { allowed: 16, required: 30, next: "Intermediate" },
+        "Intermediate": { allowed: 30, required: 45, next: "Advanced" },
+        "Advanced": { allowed: 60, required: 90, next: "All Star" }
     };
 
     const tierPoints = {
@@ -213,65 +139,65 @@
         4: [15, 12, 10, 8, 6, 1], 5: [20, 16, 14, 12, 10, 2], 6: [25, 22, 18, 15, 12, 2]
     };
 
-    function calculate() {
-        const div = document.getElementById('currentDivision').value;
-        const points = parseInt(document.getElementById('currentPoints').value) || 0;
-        const tier = document.getElementById('targetTier').value;
-        
-        // 1. KÖVETKEZŐ SZINT
-        const rule = rules[div];
-        let nextLevelHtml = `<strong>CÉL: ${rule.next.toUpperCase()}</strong><br>`;
-        
-        if (div === "All Star") {
-            nextLevelHtml += "Már All Star vagy! Gratulálunk!";
-        } else {
-            let allowedDiff = Math.max(0, rule.allowed - points);
-            let requiredDiff = Math.max(0, rule.required - points);
-            
-            nextLevelHtml += `Még <span class="highlight">${allowedDiff}</span> pont kell a felnevezéshez.<br>`;
-            nextLevelHtml += `Még <span class="highlight">${requiredDiff}</span> pont kell a kötelező lépéshez.`;
-            
-            const possiblePoints = tierPoints[tier];
-            let bestPlace = "";
-            for (let i = 0; i < possiblePoints.length; i++) {
-                if (possiblePoints[i] >= allowedDiff) bestPlace = (i + 1) + ". helyezés";
-            }
-            if (bestPlace) nextLevelHtml += `<span class="small-hint">Ezen a versenyen egy <strong>${bestPlace}</strong> már elég!</span>`;
-        }
-        document.getElementById('nextLevelResult').innerHTML = nextLevelHtml;
+    // Névsor feltöltése
+    const select = document.getElementById('memberSelect');
+    hfsData.forEach((member, index) => {
+        let opt = document.createElement('option');
+        opt.value = index;
+        opt.innerHTML = member.name;
+        select.appendChild(opt);
+    });
 
-        // 2. ALL STAR ÚT (Minimum és Maximum pontig)
-        const order = ["Newcomer", "Novice", "Intermediate", "Advanced"];
-        let minToAllStar = 0;
-        let maxToAllStar = 0;
-        let reached = false;
-
-        for (let d of order) {
-            if (d === div) reached = true;
-            if (reached) {
-                if (d === div) {
-                    minToAllStar += Math.max(0, rules[d].allowed - points);
-                    maxToAllStar += Math.max(0, rules[d].required - points);
-                } else {
-                    minToAllStar += rules[d].allowed;
-                    maxToAllStar += rules[d].required;
-                }
-            }
+    function loadMemberData() {
+        const val = document.getElementById('memberSelect').value;
+        if (val !== "custom") {
+            const member = hfsData[val];
+            document.getElementById('currentDivision').value = member.div;
+            document.getElementById('currentPoints').value = member.points;
         }
-
-        let allStarHtml = "<strong>ÚT AZ ALL STAR-IG</strong><br>";
-        if (div === "All Star") {
-            allStarHtml += "Küldetés teljesítve! 🥂";
-        } else {
-            allStarHtml += `Minimum: <span class="highlight">${minToAllStar}</span> pont kell.<br>`;
-            allStarHtml += `Maximum: <span class="highlight">${maxToAllStar}</span> pont kell.`;
-            allStarHtml += `<span class="small-hint">Min: ha mindig a leghamarabb (Allowed) váltasz.</span>`;
-        }
-        document.getElementById('allStarResult').innerHTML = allStarHtml;
+        calculate();
     }
 
-    calculate(); // Első futtatás
-</script>
+    function calculate() {
+        const div = document.getElementById('currentDivision').value;
+        const pts = parseInt(document.getElementById('currentPoints').value) || 0;
+        const tier = document.getElementById('targetTier').value;
+        const rule = rules[div];
 
+        // Következő szint kalkuláció
+        let aDiff = Math.max(0, rule.allowed - pts);
+        let rDiff = Math.max(0, rule.required - pts);
+        
+        let nextHtml = `<strong>KÖVETKEZŐ: ${rule.next.toUpperCase()}</strong><br>`;
+        nextHtml += `Mehetsz: <span class="highlight">${aDiff}</span> pont múlva.<br>`;
+        nextHtml += `Muszáj: <span class="highlight">${rDiff}</span> pont múlva.`;
+
+        // All Star út (Min/Max)
+        const levels = ["Newcomer", "Novice", "Intermediate", "Advanced"];
+        let min = 0, max = 0, start = false;
+        levels.forEach(l => {
+            if (l === div) start = true;
+            if (start) {
+                if (l === div) {
+                    min += Math.max(0, rules[l].allowed - pts);
+                    max += Math.max(0, rules[l].required - pts);
+                } else {
+                    min += rules[l].allowed;
+                    max += rules[l].required;
+                }
+            }
+        });
+
+        document.getElementById('nextLevelResult').innerHTML = nextHtml;
+        document.getElementById('allStarResult').innerHTML = `<strong>ÖSSZESEN AZ ALL STARIG:</strong><br>Minimum: <span class="highlight">${min}</span> pont | Maximum: <span class="highlight">${max}</span> pont`;
+    }
+
+    // Téma kapcsoló
+    document.getElementById('theme-toggle').addEventListener('change', (e) => {
+        document.documentElement.setAttribute('data-theme', e.target.checked ? 'dark' : 'light');
+    });
+
+    calculate();
+</script>
 </body>
 </html>
