@@ -85,6 +85,7 @@ function render(m) {
         div.className = 'day empty-day-pre';
         fragment.appendChild(div);
     }
+}
 
     // Napok generálása
     for (let d = 1; d <= daysInMonth; d++) {
@@ -122,6 +123,7 @@ function render(m) {
     for (let i = 0; i < remaining; i++) {
         const div = document.createElement('div');
         div.className = 'day empty-day-post';
+        div.innerHTML = '&nbsp;'; 
         fragment.appendChild(div);
     }
 
@@ -231,3 +233,4 @@ function initTheme() {
         localStorage.setItem('theme', theme);
     };
 }
+
