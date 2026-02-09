@@ -93,11 +93,14 @@ function render(m) {
             });
 
             if (tags) {
-                html += `<div class="event-card"><span class="event-title">${e.Event}</span><div class="participants-container">${tags}</div></div>`;
+                // Hozzáadtuk az onclick eseményt: rákattintáskor hozzáad/elvesz egy 'expanded' osztályt
+                html += `
+                    <div class="event-card" onclick="this.classList.toggle('expanded')">
+                        <span class="event-title">${e.Event}</span>
+                        <div class="participants-container">${tags}</div>
+                    </div>`;
             }
         });
-        cal.innerHTML += html + `</div>`;
-    }
 
     const totalCells = first + days;
     const remaining = (7 - (totalCells % 7)) % 7;
@@ -226,5 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
         else sb.classList.toggle('collapsed');
     };
 });
+
 
 
