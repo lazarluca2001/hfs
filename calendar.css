@@ -134,7 +134,7 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
     .sidebar { position: fixed; top: 50px; left: 0; height: calc(100vh - 50px); z-index: 1200; transform: translateX(-100%); width: 100% !important; min-width: 100%; background: var(--card-bg); transition: transform 0.3s ease-in-out; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px; }
     .sidebar.open { transform: translateX(0); }
     body:has(.sidebar.open) { overflow: hidden; }
-    .calendar-section { overflow-x: hidden; padding: 5px; }
+    .calendar-section { overflow-x: auto; padding: 5px; }
     .calendar-grid { grid-template-columns: repeat(7, 1fr); width: 100%; gap: 1px; }
     .day { min-height: 80px; padding: 4px 2px; }
     .weekday { font-size: 0.6em; height: 30px; }
@@ -147,3 +147,4 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
     .event-card.expanded .participants-container { display: flex; }
     .person-tag { font-size: 0.6em; padding: 1px 4px; width: 100%; }
 }
+
