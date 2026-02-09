@@ -265,15 +265,95 @@ body.calendar-page {
     color: #ff6666;
 }
 
-/* --- MOBIL NÉZET --- */
+/* --- MOBIL NÉZET FRISSÍTÉSE --- */
 @media (max-width: 1024px) {
-    .sidebar { position: fixed; top: 50px; left: 0; height: calc(100vh - 50px); z-index: 1000; transform: translateX(-100%); }
-    .sidebar.open { transform: translateX(0); width: 280px; }
-    .calendar-grid { grid-template-columns: repeat(7, minmax(130px, 1fr)); }
-    .calendar-section { overflow-x: auto; }
+    .sidebar { 
+        position: fixed; 
+        top: 50px; 
+        left: 0; 
+        height: calc(100vh - 50px); 
+        z-index: 1000; 
+        transform: translateX(-100%); 
+    }
+    
+    .sidebar.open { 
+        transform: translateX(0); 
+        width: 280px; 
+    }
+
+    .calendar-section { 
+        overflow-x: hidden; /* Tiltjuk az oldalsó görgetést */
+        padding: 5px;
+    }
+
+    .calendar-grid { 
+        grid-template-columns: repeat(7, 1fr); /* Fix 7 oszlop */
+        min-width: 100%; 
+        gap: 1px;
+    }
+
+    .day {
+        min-height: 80px;
+        padding: 4px 2px;
+    }
+
+    .weekday {
+        font-size: 0.6em;
+        height: 30px;
+    }
+
+    .day-number {
+        font-size: 0.7em;
+        margin-bottom: 2px;
+    }
+
+    /* --- INTERAKTÍV ESEMÉNY KÁRTYA --- */
+    .event-card {
+        cursor: pointer;
+        padding: 4px;
+        position: relative;
+        transition: background-color 0.2s;
+    }
+
+    .event-title {
+        font-size: 0.6em;
+        margin-bottom: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis; /* Ha hosszú a név, levágja pöttyökkel */
+    }
+
+    /* Alaphelyzetben rejtjük a résztvevőket mobilon */
+    .event-card .participants-container {
+        display: none;
+        margin-top: 5px;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    /* Amikor rákattintunk (JS adja hozzá az 'expanded' osztályt) */
+    .event-card.expanded {
+        z-index: 10;
+        min-width: 120px; /* Kicsit megnő, hogy olvasható legyen */
+        background-color: var(--card-bg);
+        box-shadow: var(--shadow);
+    }
+
+    .event-card.expanded .event-title {
+        white-space: normal;
+        font-size: 0.7em;
+    }
+
+    .event-card.expanded .participants-container {
+        display: flex;
+    }
+
+    .person-tag {
+        font-size: 0.6em;
+        padding: 1px 4px;
+        width: 100%;
+    }
+
+    .month-display { font-size: 1.4em; }
+    .nav-btn { width: 30px; height: 30px; }
 }
-
-
-
-
-
