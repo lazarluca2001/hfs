@@ -97,7 +97,7 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
 .filter-btn.active { border-color: var(--hfs-red); background: var(--hfs-light-red); color: var(--hfs-red); }
 
 /* STATISZTIKA - Lefelé lógó oszlopok */
-.activity-chart-container { display: flex; justify-content: space-around; align-items: flex-start; height: auto; padding: 10px; }
+.activity-chart-container { display: flex; justify-content: space-around; align-items: flex-start; height: auto !important; padding: 15px; }
 .chart-column-wrapper { display: flex; flex-direction: column; align-items: center; gap: 5px; }
 .chart-bar { width: 14px; background: var(--hfs-red);  border-radius: 0 0 5px 5px; transition: height 0.6s ease-out; }
 .chart-label { font-size: 10px; font-weight: bold; order: 3; margin-top: 5px; }
@@ -221,6 +221,7 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
         border-radius: 4px;
     }
 }
+
 
 
 
