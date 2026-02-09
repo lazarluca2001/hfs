@@ -119,10 +119,10 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
 /* ESEMÉNY KÁRTYÁK */
 .event-card { background-color: var(--event-card-bg); padding: 8px; border-radius: 10px; border: 1px solid var(--event-card-border); margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 .event-title { font-weight: 800; color: var(--hfs-red); font-size: 0.8em; display: block; margin-bottom: 6px; }
-.person-tag { background: var(--status-biztos-bg); padding: 3px 8px; border-radius: 15px; font-size: 0.7em; font-weight: 700; display: flex; align-items: center; gap: 4px; border: 1px solid var(--border-color); border-left: 4px solid #ccc; color: var(--text-color); white-space: nowrap; }
+.person-tag { background: var(--status-biztos-bg); padding: 3px 8px; border-radius: 15px; font-size: 0.7em; font-weight: 700; display: flex; align-items: center; gap: 4px; border: 1px solid var(--border-color); border-left: 4px solid #ccc; color: var(--text-color); white-space: nowrap; width: fit-content; }
 .status-biztos { border-left-color: var(--status-biztos-border); }
 .status-talan { border-left-color: var(--status-talan-border); }
-.participants-container { display: flex; }
+.participants-container { display: flex; flex-wrap: wrap; gap: 4px; width: 100%; }
 
 /* KÖVETKEZŐ ÁLLOMÁS */
 .next-event-wrapper { display: flex; flex-direction: column; gap: 8px; }
@@ -220,6 +220,7 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
         border-radius: 4px;
     }
 }
+
 
 
 
