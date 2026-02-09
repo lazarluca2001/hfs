@@ -1,155 +1,147 @@
-/* --- KONFIGURÁCIÓ --- */
-const wishlistUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSDDBNbIkZize7hPMfYPovbLgnIFWNuseLg0mjzDYGhLCwEEiF_-CiXnV76lgg2mvb54QabZ8y3Sork/pub?gid=338581218&single=true&output=csv';
-const resztvevokMap = {"Csongi":"🌈","Merci":"🦆","Mózes":"🦄","Luca":"🐶","Zoli":"🕺"};
-const validStatuses = ["igen", "talán", "talan", "fizetve", "igazolt"];
+/* --- KONFIGURÁCIÓ & CACHE --- */
+const CONFIG = {
+    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSDDBNbIkZize7hPMfYPovbLgnIFWNuseLg0mjzDYGhLCwEEiF_-CiXnV76lgg2mvb54QabZ8y3Sork/pub?gid=338581218&single=true&output=csv',
+    members: {"Csongi":"🌈","Merci":"🦆","Mózes":"🦄","Luca":"🐶","Zoli":"🕺"},
+    validStatuses: ["igen", "talán", "talan", "fizetve", "igazolt"],
+    months: ["JANUÁR","FEBRUÁR","MÁRCIUS","ÁPRILIS","MÁJUS","JÚNIUS","JÚLIUS","AUGUSZTUS","SZEPTEMBER","OKTÓBER","NOVEMBER","DECEMBER"],
+    weekdays: ["H","K","Sze","Cs","P","Szo","V"]
+};
 
 let allEvents = [];
 let activeFilter = null;
 let currentMonthIdx = new Date().getMonth();
 
+/* --- SEGÉDFÜGGVÉNYEK --- */
+const parseDate = (d) => {
+    if (!d) return null;
+    const clean = d.toString().trim().replace(/\.$/, '');
+    const dt = clean.includes('-') ? new Date(clean) : (() => {
+        const p = clean.split('.');
+        return p.length === 3 ? new Date(p[0], p[1] - 1, p[2]) : null;
+    })();
+    return dt && !isNaN(dt) ? dt.setHours(0,0,0,0) : null;
+};
+
 /* --- ADATOK BETÖLTÉSE --- */
 async function initCalendar() {
     try {
-        const res = await fetch(wishlistUrl);
+        const res = await fetch(CONFIG.url);
         const csv = await res.text();
+        const rows = csv.split('\n').map(r => r.split(',').map(c => c.replace(/"/g, '').trim()));
+        
+        const headerIndex = rows.findIndex(r => r.includes('Event'));
+        if (headerIndex === -1) return;
 
-        const rows = csv.split('\n')
-            .map(r => r.split(',').map(c => c.replace(/"/g, '').trim()))
-            .filter(r => r.length > 1);
-
-        const headerRowIndex = rows.findIndex(r => r.includes('Event'));
-        if (headerRowIndex === -1) return;
-
-        const headers = rows[headerRowIndex];
-        allEvents = [];
-
-        for (let i = headerRowIndex + 1; i < rows.length; i++) {
-            const row = rows[i];
-            const obj = {};
-            headers.forEach((h, idx) => { if (h && row[idx]) obj[h] = row[idx]; });
-
-            if (obj.Event) {
-                obj._start = parseDate(obj["Start date"]);
-                obj._end = parseDate(obj["End date"]);
-                if (obj._start) allEvents.push(obj);
-            }
-        }
+        const headers = rows[headerIndex];
+        allEvents = rows.slice(headerIndex + 1)
+            .filter(r => r[headers.indexOf('Event')])
+            .map(row => {
+                const obj = {};
+                headers.forEach((h, i) => obj[h] = row[i]);
+                obj._startTs = parseDate(obj["Start date"]);
+                obj._endTs = parseDate(obj["End date"]) || obj._startTs;
+                return obj;
+            })
+            .filter(e => e._startTs);
 
         renderFilter();
         setupMonthSelect();
-        render(currentMonthIdx);
-        updateNext();
-        updateActivityChart();
+        updateUI();
     } catch (e) {
-        console.error("CSV hiba:", e);
+        console.error("Betöltési hiba:", e);
     }
 }
 
-function parseDate(d) {
-    if (!d) return null;
-    const clean = d.toString().trim().replace(/\.$/, '');
-    if (clean.includes('-')) {
-        const dt = new Date(clean);
-        return isNaN(dt) ? null : dt;
-    }
-    const p = clean.split('.');
-    if (p.length !== 3) return null;
-    return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+/* --- UI RENDERELÉS --- */
+function updateUI() {
+    render(currentMonthIdx);
+    updateNext();
+    updateActivityChart();
 }
 
-/* --- NAPTÁR RENDERELÉS --- */
 function render(m) {
     const cal = document.getElementById('calendar');
     if (!cal) return;
+    
+    const fragment = document.createDocumentFragment();
     cal.innerHTML = '';
+    document.getElementById('currentMonthHeader').innerText = CONFIG.months[m];
 
-    const months = ["JANUÁR","FEBRUÁR","MÁRCIUS","ÁPRILIS","MÁJUS","JÚNIUS","JÚLIUS","AUGUSZTUS","SZEPTEMBER","OKTÓBER","NOVEMBER","DECEMBER"];
-    document.getElementById('currentMonthHeader').innerText = months[m];
-
-    // Napok nevei
-    ["H","K","Sze","Cs","P","Szo","V"].forEach(d => {
+    // Fejléc (Napok)
+    CONFIG.weekdays.forEach(d => {
         const div = document.createElement('div');
         div.className = 'weekday';
-        div.innerText = d;
-        cal.appendChild(div);
+        div.textContent = d;
+        fragment.appendChild(div);
     });
 
-    const first = (new Date(2026, m, 1).getDay() + 6) % 7;
-    const days = new Date(2026, m + 1, 0).getDate();
+    const firstDay = (new Date(2026, m, 1).getDay() + 6) % 7;
+    const daysInMonth = new Date(2026, m + 1, 0).getDate();
+    const todayTs = new Date().setHours(0,0,0,0);
 
-    // Hónap előtti üres napok
-    for (let i = 0; i < first; i++) {
+    // Üres napok (Pre)
+    for (let i = 0; i < firstDay; i++) {
         const div = document.createElement('div');
         div.className = 'day empty-day-pre';
-        cal.appendChild(div);
+        fragment.appendChild(div);
     }
 
-    // Hónap tényleges napjai
-    for (let d = 1; d <= days; d++) {
-        const currDate = new Date(2026, m, d);
-        const currTimestamp = currDate.setHours(0,0,0,0);
-        const todayTimestamp = new Date().setHours(0,0,0,0);
-        
-        const dailyEvents = allEvents.filter(e => {
-            const start = new Date(e._start).setHours(0,0,0,0);
-            const end = e._end ? new Date(e._end).setHours(0,0,0,0) : start;
-            return currTimestamp >= start && currTimestamp <= end;
-        });
+    // Napok generálása
+    for (let d = 1; d <= daysInMonth; d++) {
+        const currTs = new Date(2026, m, d).setHours(0,0,0,0);
+        const dayEvents = allEvents.filter(e => currTs >= e._startTs && currTs <= e._endTs);
 
         const dayDiv = document.createElement('div');
-        dayDiv.className = `day ${todayTimestamp === currTimestamp ? 'today' : ''}`;
+        dayDiv.className = `day ${todayTs === currTs ? 'today' : ''}`;
         dayDiv.innerHTML = `<span class="day-number">${d}</span>`;
 
-        dailyEvents.forEach(e => {
-            let tags = "";
-            Object.keys(resztvevokMap).forEach(name => {
+        dayEvents.forEach(e => {
+            let tagsHtml = "";
+            Object.entries(CONFIG.members).forEach(([name, emoji]) => {
                 const status = (e[name] || "").toLowerCase();
-                if (validStatuses.some(vs => status.includes(vs))) {
+                if (CONFIG.validStatuses.some(vs => status.includes(vs))) {
                     if (!activeFilter || activeFilter === name) {
                         const isTalan = status.includes("talan") || status.includes("talán");
-                        tags += `<div class="person-tag ${isTalan ? 'status-talan' : 'status-biztos'}"><span>${resztvevokMap[name]}</span> ${name}</div>`;
+                        tagsHtml += `<div class="person-tag ${isTalan ? 'status-talan' : 'status-biztos'}"><span>${emoji}</span> ${name}</div>`;
                     }
                 }
             });
 
-            if (tags) {
-                const eventCard = document.createElement('div');
-                eventCard.className = 'event-card';
-                eventCard.innerHTML = `<span class="event-title">${e.Event}</span><div class="participants-container">${tags}</div>`;
-                dayDiv.appendChild(eventCard);
+            if (tagsHtml) {
+                const card = document.createElement('div');
+                card.className = 'event-card';
+                card.innerHTML = `<span class="event-title">${e.Event}</span><div class="participants-container">${tagsHtml}</div>`;
+                dayDiv.appendChild(card);
             }
         });
-        cal.appendChild(dayDiv);
+        fragment.appendChild(dayDiv);
     }
 
-    // --- JAVÍTÁS: Hónap utáni üres napok generálása ---
-    const totalCells = first + days;
-    const missingCells = (7 - (totalCells % 7)) % 7;
-
-    for (let i = 0; i < missingCells; i++) {
+    // Üres napok (Post)
+    const remaining = (7 - ((firstDay + daysInMonth) % 7)) % 7;
+    for (let i = 0; i < remaining; i++) {
         const div = document.createElement('div');
         div.className = 'day empty-day-post';
-        cal.appendChild(div);
+        fragment.appendChild(div);
     }
+
+    cal.appendChild(fragment);
 }
 
-/* --- FUNKCIÓK --- */
+/* --- STATISZTIKA & ESEMÉNYEK --- */
 function updateActivityChart() {
     const container = document.getElementById('activityChart');
-    if (!container || allEvents.length === 0) return;
-    
-    container.innerHTML = Object.keys(resztvevokMap).map(name => {
+    if (!container) return;
+
+    container.innerHTML = Object.entries(CONFIG.members).map(([name, emoji]) => {
         const count = allEvents.filter(e => {
             const s = (e[name] || "").toLowerCase();
-            return validStatuses.some(vs => s.includes(vs));
+            return CONFIG.validStatuses.some(vs => s.includes(vs));
         }).length;
-        
-        // Magasság számítása (max 80px, hogy maradjon hely az emojinak és számnak)
-        const height = (count / allEvents.length) * 80;
-        
+        const height = allEvents.length ? (count / allEvents.length) * 80 : 0;
         return `
             <div class="chart-column-wrapper">
-                <span class="chart-emoji">${resztvevokMap[name]}</span>
+                <span class="chart-emoji">${emoji}</span>
                 <div class="chart-bar" style="height:${height}px"></div>
                 <span class="chart-label">${count}</span>
             </div>`;
@@ -158,108 +150,84 @@ function updateActivityChart() {
 
 function updateNext() {
     const box = document.getElementById('nextEventContent');
-    if (!box || allEvents.length === 0) return;
-    
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
+    if (!box) return;
 
-    const upcoming = allEvents
-        .filter(e => {
-            const eventEnd = e._end ? new Date(e._end) : new Date(e._start);
-            eventEnd.setHours(0, 0, 0, 0);
-            return eventEnd >= now;
-        })
-        .sort((a, b) => a._start - b._start)[0];
+    const now = new Date().setHours(0,0,0,0);
+    const next = allEvents
+        .filter(e => e._endTs >= now)
+        .sort((a, b) => a._startTs - b._startTs)[0];
 
-    if (upcoming) {
-        const startDate = new Date(upcoming._start);
-        startDate.setHours(0, 0, 0, 0);
-        
-        const diffTime = startDate.getTime() - now.getTime();
-        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-        
-        let dayText = (diffDays > 0) ? `Még ${diffDays} nap` : (diffDays === 0 ? "Ma kezdődik! 🔥" : "Folyamatban... 🚀");
-
+    if (next) {
+        const diff = Math.round((next._startTs - now) / 86400000);
+        const dayText = diff > 0 ? `Még ${diff} nap` : (diff === 0 ? "Ma kezdődik! 🔥" : "Folyamatban... 🚀");
         box.innerHTML = `
             <div class="next-event-wrapper">
-                <div class="next-event-title">${upcoming.Event}</div>
-                <div class="next-event-info">📍 ${upcoming.Location || 'Ismeretlen'}</div>
-                <div class="next-event-info">🗓️ ${upcoming["Start date"]}</div>
+                <div class="next-event-title">${next.Event}</div>
+                <div class="next-event-info">📍 ${next.Location || 'Ismeretlen'}</div>
+                <div class="next-event-info">🗓️ ${next["Start date"]}</div>
                 <div class="next-event-countdown">${dayText}</div>
             </div>`;
     } else {
-        box.innerHTML = "<div class='next-event-info'>Nincs következő esemény.</div>";
+        box.innerHTML = "Nincs több esemény.";
     }
 }
 
+/* --- EVENT HANDLERS --- */
 function renderFilter() {
     const box = document.getElementById('memberFilter');
     if (!box) return;
-    box.innerHTML = '';
-    Object.keys(resztvevokMap).forEach(n => {
-        const btn = document.createElement('div');
-        btn.className = `filter-btn ${activeFilter === n ? 'active' : ''}`;
-        btn.innerHTML = `<span>${resztvevokMap[n]}</span> ${n}`;
-        btn.addEventListener('click', () => {
-            activeFilter = activeFilter === n ? null : n;
-            renderFilter();
-            render(currentMonthIdx);
-        });
-        box.appendChild(btn);
-    });
+    box.innerHTML = Object.entries(CONFIG.members).map(([name, emoji]) => `
+        <div class="filter-btn ${activeFilter === name ? 'active' : ''}" onclick="toggleFilter('${name}')">
+            <span>${emoji}</span> ${name}
+        </div>
+    `).join('');
 }
+
+window.toggleFilter = (name) => {
+    activeFilter = activeFilter === name ? null : name;
+    renderFilter();
+    render(currentMonthIdx);
+};
 
 function setupMonthSelect() {
     const sel = document.getElementById('monthSelect');
     if (!sel) return;
-    const months = ["Január","Február","Március","Április","Május","Június","Július","Augusztus","Szeptember","Október","November","December"];
-    sel.innerHTML = months.map((m, i) => `<option value="${i}" ${i === currentMonthIdx ? 'selected' : ''}>${m}</option>`).join('');
+    sel.innerHTML = CONFIG.months.map((m, i) => `<option value="${i}" ${i === currentMonthIdx ? 'selected' : ''}>${m}</option>`).join('');
     sel.onchange = e => { currentMonthIdx = parseInt(e.target.value); render(currentMonthIdx); };
 }
 
 window.changeMonth = (d) => {
     currentMonthIdx = (currentMonthIdx + d + 12) % 12;
-    const select = document.getElementById('monthSelect');
-    if (select) select.value = currentMonthIdx;
+    document.getElementById('monthSelect').value = currentMonthIdx;
     render(currentMonthIdx);
-}
+};
 
 window.goToToday = () => {
     currentMonthIdx = new Date().getMonth();
-    const select = document.getElementById('monthSelect');
-    if (select) select.value = currentMonthIdx;
+    document.getElementById('monthSelect').value = currentMonthIdx;
     render(currentMonthIdx);
-}
+};
+
+/* --- INIT --- */
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    initCalendar();
+    
+    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        const sb = document.getElementById('sidebar');
+        sb.classList.toggle(window.innerWidth <= 1024 ? 'open' : 'collapsed');
+    });
+});
 
 function initTheme() {
     const toggle = document.getElementById('checkbox');
     if (!toggle) return;
-    if (localStorage.getItem('theme') === 'dark') {
-        document.documentElement.dataset.theme = 'dark';
-        toggle.checked = true;
-    }
+    const isDark = localStorage.getItem('theme') === 'dark';
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    toggle.checked = isDark;
     toggle.onchange = () => {
         const theme = toggle.checked ? 'dark' : 'light';
         document.documentElement.dataset.theme = theme;
         localStorage.setItem('theme', theme);
     };
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    initTheme();
-    initCalendar();
-
-    const toggleBtn = document.getElementById('sidebarToggle');
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            const sb = document.getElementById('sidebar');
-            if (window.innerWidth <= 1024) {
-                sb.classList.toggle('open');
-            } else {
-                sb.classList.toggle('collapsed');
-            }
-        });
-    }
-});
-
-
