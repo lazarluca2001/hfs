@@ -122,6 +122,7 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
 .person-tag { background: var(--status-biztos-bg); padding: 3px 8px; border-radius: 15px; font-size: 0.7em; font-weight: 700; display: flex; align-items: center; gap: 4px; border: 1px solid var(--border-color); border-left: 4px solid #ccc; color: var(--text-color); white-space: nowrap; }
 .status-biztos { border-left-color: var(--status-biztos-border); }
 .status-talan { border-left-color: var(--status-talan-border); }
+.participants-container { display: flex; }
 
 /* KÖVETKEZŐ ÁLLOMÁS */
 .next-event-wrapper { display: flex; flex-direction: column; gap: 8px; }
@@ -219,5 +220,6 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
         border-radius: 4px;
     }
 }
+
 
 
