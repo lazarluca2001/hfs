@@ -96,11 +96,12 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
 }
 .filter-btn.active { border-color: var(--hfs-red); background: var(--hfs-light-red); color: var(--hfs-red); }
 
-/* STATISZTIKA */
-.activity-chart-container { display: flex; justify-content: space-around; align-items: flex-end; height: 100px; padding: 10px; }
-.chart-column-wrapper { display: flex; flex-direction: column; align-items: center; }
-.chart-bar { width: 14px; background: var(--hfs-red); border-radius: 5px 5px 0 0; transition: height 0.6s ease-out; }
-.chart-label { font-size: 10px; font-weight: bold; margin-bottom: 5px; }
+/* STATISZTIKA - Lefelé lógó oszlopok */
+.activity-chart-container { display: flex; justify-content: space-around; align-items: flex-start; height: 120px; padding: 10px; }
+.chart-column-wrapper { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.chart-bar { width: 14px; background: var(--hfs-red);  border-radius: 0 0 5px 5px; transition: height 0.6s ease-out; }
+.chart-label { font-size: 10px; font-weight: bold; order: 3; margin-top: 5px; }
+.chart-emoji { order: 1; font-size: 1.2em; }
 
 /* NAPTÁR SZEKCIÓ */
 .calendar-section { flex: 1; min-height: calc(100vh - 50px); display: flex; flex-direction: column; background: var(--bg-color); }
@@ -108,7 +109,6 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
 .month-title-group { display: flex; align-items: center; justify-content: center; gap: 25px; }
 .month-display { color: var(--hfs-red); font-size: 2.2em; font-weight: 800; text-transform: uppercase; margin: 0; }
 .nav-btn { background: var(--hfs-red); color: white; border: none; border-radius: 50%; width: 38px; height: 38px; cursor: pointer; }
-
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--border-color); gap: 1px; width: 100%; }
 .calendar-footer-spacer { height: 120px; width: 100%; background: transparent; flex-shrink: 0; }
 .weekday { background: var(--hfs-red); color: white; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8em; text-transform: uppercase; }
@@ -221,6 +221,7 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
         border-radius: 4px;
     }
 }
+
 
 
 
