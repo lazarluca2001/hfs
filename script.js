@@ -66,6 +66,7 @@ function render(m) {
     const months = ["JANUÁR","FEBRUÁR","MÁRCIUS","ÁPRILIS","MÁJUS","JÚNIUS","JÚLIUS","AUGUSZTUS","SZEPTEMBER","OKTÓBER","NOVEMBER","DECEMBER"];
     document.getElementById('currentMonthHeader').innerText = months[m];
 
+    // Napok nevei
     ["H","K","Sze","Cs","P","Szo","V"].forEach(d => {
         const div = document.createElement('div');
         div.className = 'weekday';
@@ -76,12 +77,14 @@ function render(m) {
     const first = (new Date(2026, m, 1).getDay() + 6) % 7;
     const days = new Date(2026, m + 1, 0).getDate();
 
+    // Hónap előtti üres napok
     for (let i = 0; i < first; i++) {
         const div = document.createElement('div');
         div.className = 'day empty-day-pre';
         cal.appendChild(div);
     }
 
+    // Hónap tényleges napjai
     for (let d = 1; d <= days; d++) {
         const currDate = new Date(2026, m, d);
         const currTimestamp = currDate.setHours(0,0,0,0);
@@ -102,7 +105,6 @@ function render(m) {
             Object.keys(resztvevokMap).forEach(name => {
                 const status = (e[name] || "").toLowerCase();
                 if (validStatuses.some(vs => status.includes(vs))) {
-                    // Ha van aktív szűrő, csak azt a személyt mutassuk
                     if (!activeFilter || activeFilter === name) {
                         const isTalan = status.includes("talan") || status.includes("talán");
                         tags += `<div class="person-tag ${isTalan ? 'status-talan' : 'status-biztos'}"><span>${resztvevokMap[name]}</span> ${name}</div>`;
@@ -118,6 +120,16 @@ function render(m) {
             }
         });
         cal.appendChild(dayDiv);
+    }
+
+    // --- JAVÍTÁS: Hónap utáni üres napok generálása ---
+    const totalCells = first + days;
+    const missingCells = (7 - (totalCells % 7)) % 7;
+
+    for (let i = 0; i < missingCells; i++) {
+        const div = document.createElement('div');
+        div.className = 'day empty-day-post';
+        cal.appendChild(div);
     }
 }
 
@@ -249,4 +261,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
 
