@@ -134,17 +134,18 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
     .sidebar { position: fixed; top: 50px; left: 0; height: calc(100vh - 50px); z-index: 1200; transform: translateX(-100%); width: 100% !important; min-width: 100%; background: var(--card-bg); transition: transform 0.3s ease-in-out; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px; }
     .sidebar.open { transform: translateX(0); }
     body:has(.sidebar.open) { overflow: hidden; }
-    .calendar-section { overflow-x: auto; padding: 5px; }
-    .calendar-grid { grid-template-columns: repeat(7, 1fr); width: 100%; gap: 1px; }
-    .day { min-height: 80px; padding: 4px 2px; }
-    .weekday { font-size: 0.6em; height: 30px; }
+    .calendar-section { overflow-x: auto; padding: 5px; -webkit-overflow-scrolling: touch; padding: 0; width: 100%}
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 120px); width: max-content; gap: 1px; }
+    .day { width: 120px; min-width: 120px; min-height: 140px; padding: 8px; }
+    .weekday {width: 120px; min-width: 120px; font-size: 0.8em; }
     .day-number { font-size: 0.7em; }
     .event-card { cursor: pointer; padding: 4px; position: relative; }
-    .event-title { font-size: 0.6em; margin-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .event-card .participants-container { display: none; margin-top: 5px; flex-direction: column; gap: 3px; }
+    .event-title { font-size: 0.7em; margin-bottom: 0; white-space: normal; overflow: visible; text-overflow: clip; }
+    .event-card .participants-container { display: flex; margin-top: 5px; flex-direction: column; gap: 3px; }
     .event-card.expanded { z-index: 10; min-width: 120px; background-color: var(--card-bg); box-shadow: var(--shadow); }
     .event-card.expanded .event-title { white-space: normal; font-size: 0.7em; }
     .event-card.expanded .participants-container { display: flex; }
     .person-tag { font-size: 0.6em; padding: 1px 4px; width: 100%; }
 }
+
 
