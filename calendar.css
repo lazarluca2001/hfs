@@ -129,23 +129,95 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
 .next-event-info { font-size: 0.9em; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
 .next-event-countdown { margin-top: 5px; font-weight: 800; color: var(--hfs-red); font-size: 1em; }
 
-/* --- MOBIL NÉZET --- */
+/* --- MOBIL NÉZET FRISSÍTÉSE (Fix cellák + Oldalra görgetés) --- */
 @media (max-width: 1024px) {
-    .sidebar { position: fixed; top: 50px; left: 0; height: calc(100vh - 50px); z-index: 1200; transform: translateX(-100%); width: 100% !important; min-width: 100%; background: var(--card-bg); transition: transform 0.3s ease-in-out; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px; }
+    /* Oldalsáv: 100% szélesség, görgethető tartalommal */
+    .sidebar { 
+        position: fixed; 
+        top: 50px; 
+        left: 0; 
+        height: calc(100vh - 50px); 
+        z-index: 1200; 
+        transform: translateX(-100%); 
+        width: 100% !important; 
+        min-width: 100%; 
+        background: var(--card-bg); 
+        transition: transform 0.3s ease-in-out; 
+        overflow-y: auto; 
+        -webkit-overflow-scrolling: touch; 
+        padding: 20px; 
+    }
+    
     .sidebar.open { transform: translateX(0); }
+    
+    /* Ha a menü nyitva van, a háttér ne görögjön le-föl */
     body:has(.sidebar.open) { overflow: hidden; }
-    .calendar-section { overflow-x: auto; padding: 5px; -webkit-overflow-scrolling: touch; padding: 0; width: 100%}
-    .calendar-grid { display: grid; grid-template-columns: repeat(7, 120px); width: max-content; gap: 1px; }
-    .day { width: 120px; min-width: 120px; min-height: 140px; padding: 8px; }
-    .weekday {width: 120px; min-width: 120px; font-size: 0.8em; }
-    .day-number { font-size: 0.7em; }
-    .event-card { cursor: pointer; padding: 4px; position: relative; }
-    .event-title { font-size: 0.7em; margin-bottom: 0; white-space: normal; overflow: visible; text-overflow: clip; }
-    .event-card .participants-container { display: flex; margin-top: 5px; flex-direction: column; gap: 3px; }
-    .event-card.expanded { z-index: 10; min-width: 120px; background-color: var(--card-bg); box-shadow: var(--shadow); }
-    .event-card.expanded .event-title { white-space: normal; font-size: 0.7em; }
-    .event-card.expanded .participants-container { display: flex; }
-    .person-tag { font-size: 0.6em; padding: 1px 4px; width: 100%; }
+
+    /* Naptár szekció: Engedélyezzük a vízszintes görgetést */
+    .calendar-section { 
+        overflow-x: auto; 
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch; 
+        padding: 0; 
+        width: 100%;
+    }
+
+    /* Fix 120px-es oszlopok kényszerítése */
+    .calendar-grid { 
+        display: grid; 
+        grid-template-columns: repeat(7, 120px); 
+        width: max-content; 
+        gap: 1px; 
+        background: var(--border-color); /* Hogy látsszanak a rácsvonalak görgetéskor is */
+    }
+
+    .weekday { 
+        width: 120px; 
+        min-width: 120px; 
+        font-size: 0.75em; 
+        height: 35px;
+    }
+
+    .day { 
+        width: 120px; 
+        min-width: 120px; 
+        min-height: 140px; 
+        padding: 6px; 
+    }
+
+    .day-number { font-size: 0.8em; opacity: 0.6; }
+
+    /* Eseménykártyák: Fixen látható minden tartalom */
+    .event-card { 
+        cursor: default; 
+        padding: 5px; 
+        margin-bottom: 5px;
+        background-color: var(--event-card-bg);
+    }
+
+    .event-title { 
+        font-size: 0.75em; 
+        line-height: 1.2;
+        margin-bottom: 4px; 
+        white-space: normal; /* Engedjük a több sorba törést */
+        overflow: visible; 
+        font-weight: 800;
+    }
+
+    /* Résztvevők listája: Egymás alatt, fixen megjelenítve */
+    .event-card .participants-container { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 3px; 
+        margin-top: 5px;
+    }
+
+    .person-tag { 
+        font-size: 0.65em; 
+        padding: 2px 4px; 
+        width: 100%; 
+        border-radius: 4px;
+    }
 }
 
 
