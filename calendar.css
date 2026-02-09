@@ -109,13 +109,21 @@ body.calendar-page {
 
 /* SIDEBAR */
 .sidebar {
-    width: 320px; min-width: 320px; background: var(--card-bg);
-    padding: 25px; border-right: 1px solid var(--border-color);
-    display: flex; flex-direction: column; gap: 20px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto;
+    width: 320px;
+    min-width: 320px;
+    background: var(--card-bg);
+    padding: 25px;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 .sidebar.collapsed { width: 0; min-width: 0; padding: 0; overflow: hidden; border: none; }
+
+@media (min-height: 600px) {
+    .sidebar { position: sticky; top: 50px; height: calc(100vh - 50px); }
+}
 
 .sidebar-logo { 
     color: var(--hfs-red); font-size: 1.5em; margin-bottom: 10px; 
@@ -185,9 +193,10 @@ body.calendar-page {
 }
 
 .calendar-footer-spacer {
-    height: 100px;
+    height: 120px;
     width: 100%;
     background: transparent;
+    flex-shrink: 0;
 }
 
 .weekday {
@@ -357,3 +366,4 @@ body.calendar-page {
     .month-display { font-size: 1.4em; }
     .nav-btn { width: 30px; height: 30px; }
 }
+
