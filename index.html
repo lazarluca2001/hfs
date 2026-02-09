@@ -3,125 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WSDC All Star Kalkulátor</title>
+    <title>HFS | WSDC Kalkulátor</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 800px; margin: 20px auto; padding: 20px; background-color: #f0f2f5; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { color: #1a73e8; border-bottom: 2px solid #e8eaed; padding-bottom: 10px; }
-        label { font-weight: bold; display: block; margin-top: 15px; }
-        select, input { padding: 12px; margin: 8px 0; width: 100%; border: 1px solid #dadce0; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        .result-box { margin-top: 25px; padding: 20px; border-radius: 8px; font-size: 16px; }
-        .next-level { background: #e7f3ff; border-left: 5px solid #2196F3; margin-bottom: 15px; padding: 15px; }
-        .all-star-goal { background: #fff4e5; border-left: 5px solid #ff9800; padding: 15px; }
-        .highlight { font-weight: bold; color: #d93025; }
-        .tier-hint { font-style: italic; color: #5f6368; margin-top: 10px; font-size: 0.9em; }
+        /* --- VÁLTOZÓK ÉS TÉMÁK --- */
+        :root {
+            --hfs-red: #800000;
+            --hfs-red-hover: #a00000;
+            --hfs-light-red: #fff0f0;
+            --bg-color: #f4f4f4;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --text-muted: #666;
+            --border-color: #ddd;
+            --nav-bg: #ffffff;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --text-color: #f0f0f0;
+            --text-muted: #aaa;
+            --border-color: #333;
+            --nav-bg: #1e1e1e;
+            --hfs-red: #ff4d4d;
+            --hfs-light-red: #2d1a1a;
+            --shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        /* --- ALAPVETŐ BEÁLLÍTÁSOK --- */
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background 0.3s, color 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- FIX NAVIGÁCIÓ --- */
+        .fixed-nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 50px;
+            background: var(--nav-bg); border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; z-index: 1100; box-shadow: var(--shadow);
+        }
+        .nav-left { display: flex; align-items: center; gap: 15px; }
+        .back-link { text-decoration: none; color: var(--hfs-red); font-weight: bold; font-size: 0.9em; }
+        
+        /* Theme Switch */
+        .theme-wrap { display: flex; align-items: center; gap: 10px; font-size: 0.8em; font-weight: bold; }
+        .theme-switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .theme-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--hfs-red); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* --- TARTALOM --- */
+        .container {
+            margin-top: 80px;
+            width: 95%;
+            max-width: 600px;
+            padding-bottom: 50px;
+        }
+
+        .sidebar-logo { 
+            color: var(--hfs-red); 
+            font-size: 1.8em; 
+            margin-bottom: 20px; 
+            font-weight: 900; 
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 16px; 
+            padding: 25px; 
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .sidebar-card h3 { 
+            margin: 0 0 15px 0; 
+            color: var(--hfs-red); 
+            font-size: 1em; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+        }
+
+        label { 
+            display: block; 
+            margin-top: 20px; 
+            font-weight: bold; 
+            font-size: 0.85em;
+            color: var(--text-muted);
+        }
+
+        select, input { 
+            padding: 12px; 
+            margin: 8px 0; 
+            width: 100%; 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        /* --- EREDMÉNYEK --- */
+        .result-group {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .result-box {
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 5px solid var(--hfs-red);
+        }
+
+        .next-level-box { background: var(--hfs-light-red); }
+        .allstar-box { background: var(--bg-color); border-left-color: var(--text-color); }
+
+        .highlight { font-weight: 800; color: var(--hfs-red); font-size: 1.1em; }
+        .small-hint { font-size: 0.85em; color: var(--text-muted); margin-top: 8px; display: block; }
+
+        @media (max-width: 600px) {
+            .container { width: 90%; }
+        }
     </style>
 </head>
-<body>
+<body class="calendar-page">
 
-<div class="card">
-    <h2>WSDC Szintlépés & All Star Útmutató</h2>
-    
-    <label for="currentDivision">Jelenlegi divíziód:</label>
-    <select id="currentDivision" onchange="calculate()">
-        <option value="Newcomer">Newcomer</option>
-        <option value="Novice">Novice</option>
-        <option value="Intermediate">Intermediate</option>
-        <option value="Advanced">Advanced</option>
-        <option value="All Star">All Star</option>
-    </select>
+<nav class="fixed-nav">
+    <div class="nav-left">
+        <a href="#" class="back-link">HFS DASHBOARD</a>
+    </div>
+    <div class="theme-wrap">
+        <span>DARK MODE</span>
+        <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+</nav>
 
-    <label for="currentPoints">Jelenlegi pontjaid a mostani szinteden:</label>
-    <input type="number" id="currentPoints" value="0" min="0" oninput="calculate()">
+<div class="container">
+    <div class="sidebar-logo">WSDC Kalkulátor</div>
 
-    <label for="targetTier">Következő versenyed mérete (Tier):</label>
-    <select id="targetTier" onchange="calculate()">
-        <option value="1">Tier 1 (5-10 pár)</option>
-        <option value="2">Tier 2 (11-19 pár)</option>
-        <option value="3">Tier 3 (20-39 pár)</option>
-        <option value="4">Tier 4 (40-79 pár)</option>
-        <option value="5">Tier 5 (80-129 pár)</option>
-        <option value="6">Tier 6 (130+ pár)</option>
-    </select>
+    <div class="card sidebar-card">
+        <h3>Versenyzői Adatok</h3>
+        
+        <label for="currentDivision">JELENLEGI DIVÍZIÓ</label>
+        <select id="currentDivision" onchange="calculate()">
+            <option value="Newcomer">Newcomer</option>
+            <option value="Novice">Novice</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+            <option value="All Star">All Star</option>
+        </select>
 
-    <div id="nextLevelResult" class="next-level"></div>
-    <div id="allStarResult" class="all-star-goal"></div>
+        <label for="currentPoints">PONTOK SZÁMA (AKTUÁLIS SZINTEN)</label>
+        <input type="number" id="currentPoints" value="0" min="0" oninput="calculate()">
+
+        <label for="targetTier">KÖVETKEZŐ VERSENY MÉRETE (TIER)</label>
+        <select id="targetTier" onchange="calculate()">
+            <option value="1">Tier 1 (5-10 pár)</option>
+            <option value="2">Tier 2 (11-19 pár)</option>
+            <option value="3">Tier 3 (20-39 pár)</option>
+            <option value="4">Tier 4 (40-79 pár)</option>
+            <option value="5">Tier 5 (80-129 pár)</option>
+            <option value="6">Tier 6 (130+ pár)</option>
+        </select>
+
+        <div class="result-group">
+            <div id="nextLevelResult" class="result-box next-level-box"></div>
+            <div id="allStarResult" class="result-box allstar-box"></div>
+        </div>
+    </div>
 </div>
 
 <script>
-const rules = {
-    "Newcomer": { order: 0, next: "Novice", allowed: 0, required: 1 },
-    "Novice": { order: 1, next: "Intermediate", allowed: 16, required: 30 },
-    "Intermediate": { order: 2, next: "Advanced", allowed: 30, required: 45 },
-    "Advanced": { order: 3, next: "All Star", allowed: 60, required: 90 },
-    "All Star": { order: 4, next: "Champion", allowed: 150, required: 225 }
-};
+    /* --- TÉMA KEZELÉS --- */
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('change', () => {
+        document.documentElement.setAttribute('data-theme', themeToggle.checked ? 'dark' : 'light');
+    });
 
-const tierPoints = {
-    1: [3, 2, 1], 2: [6, 4, 3, 2, 1], 3: [10, 8, 6, 4, 2, 1],
-    4: [15, 12, 10, 8, 6, 1], 5: [20, 16, 14, 12, 10, 2], 6: [25, 22, 18, 15, 12, 2]
-};
+    /* --- KALKULÁCIÓS LOGIKA --- */
+    const rules = {
+        "Newcomer": { next: "Novice", allowed: 0, required: 1 },
+        "Novice": { next: "Intermediate", allowed: 16, required: 30 },
+        "Intermediate": { next: "Advanced", allowed: 30, required: 45 },
+        "Advanced": { next: "All Star", allowed: 60, required: 90 },
+        "All Star": { next: "Champion", allowed: 150, required: 225 }
+    };
 
-function calculate() {
-    const currentDiv = document.getElementById('currentDivision').value;
-    const points = parseInt(document.getElementById('currentPoints').value) || 0;
-    const tier = document.getElementById('targetTier').value;
-    
-    // 1. KÖVETKEZŐ SZINT SZÁMÍTÁSA
-    const rule = rules[currentDiv];
-    let nextLevelHtml = `<strong>Következő cél: ${rule.next}</strong><br>`;
-    
-    if (currentDiv === "All Star") {
-        nextLevelHtml += "Már All Star vagy! Irány a Champion szint.";
-    } else {
-        let allowedDiff = Math.max(0, rule.allowed - points);
-        let requiredDiff = Math.max(0, rule.required - points);
+    const tierPoints = {
+        1: [3, 2, 1], 2: [6, 4, 3, 2, 1], 3: [10, 8, 6, 4, 2, 1],
+        4: [15, 12, 10, 8, 6, 1], 5: [20, 16, 14, 12, 10, 2], 6: [25, 22, 18, 15, 12, 2]
+    };
+
+    function calculate() {
+        const div = document.getElementById('currentDivision').value;
+        const points = parseInt(document.getElementById('currentPoints').value) || 0;
+        const tier = document.getElementById('targetTier').value;
         
-        nextLevelHtml += `A szintlépéshez (Allowed) kell még: <span class="highlight">${allowedDiff}</span> pont.<br>`;
-        nextLevelHtml += `A kötelező szintlépéshez (Required) kell még: <span class="highlight">${requiredDiff}</span> pont.<br>`;
+        // 1. KÖVETKEZŐ SZINT
+        const rule = rules[div];
+        let nextLevelHtml = `<strong>CÉL: ${rule.next.toUpperCase()}</strong><br>`;
         
-        const possiblePoints = tierPoints[tier];
-        let placeNeeded = "";
-        for (let i = 0; i < possiblePoints.length; i++) {
-            if (possiblePoints[i] >= allowedDiff) placeNeeded = (i + 1) + ". helyezés";
+        if (div === "All Star") {
+            nextLevelHtml += "Már All Star vagy! Gratulálunk!";
+        } else {
+            let allowedDiff = Math.max(0, rule.allowed - points);
+            let requiredDiff = Math.max(0, rule.required - points);
+            
+            nextLevelHtml += `Még <span class="highlight">${allowedDiff}</span> pont kell a felnevezéshez.<br>`;
+            nextLevelHtml += `Még <span class="highlight">${requiredDiff}</span> pont kell a kötelező lépéshez.`;
+            
+            const possiblePoints = tierPoints[tier];
+            let bestPlace = "";
+            for (let i = 0; i < possiblePoints.length; i++) {
+                if (possiblePoints[i] >= allowedDiff) bestPlace = (i + 1) + ". helyezés";
+            }
+            if (bestPlace) nextLevelHtml += `<span class="small-hint">Ezen a versenyen egy <strong>${bestPlace}</strong> már elég!</span>`;
         }
-        if (placeNeeded) nextLevelHtml += `<div class="tier-hint">Ezen a versenyen egy ${placeNeeded} már elég a felnevezéshez!</div>`;
-    }
-    document.getElementById('nextLevelResult').innerHTML = nextLevelHtml;
+        document.getElementById('nextLevelResult').innerHTML = nextLevelHtml;
 
-    // 2. ALL STAR ÚT SZÁMÍTÁSA (Mennyi pont kell összesen az All Star-ig)
-    let totalMinToAllStar = 0;
-    let totalMaxToAllStar = 0;
+        // 2. ALL STAR ÚT (Minimum és Maximum pontig)
+        const order = ["Newcomer", "Novice", "Intermediate", "Advanced"];
+        let minToAllStar = 0;
+        let maxToAllStar = 0;
+        let reached = false;
 
-    const divOrder = ["Newcomer", "Novice", "Intermediate", "Advanced"];
-    let reachedCurrent = false;
-
-    for (let d of divOrder) {
-        if (d === currentDiv) reachedCurrent = true;
-        
-        if (reachedCurrent) {
-            if (d === currentDiv) {
-                totalMinToAllStar += Math.max(0, rules[d].allowed - points);
-                totalMaxToAllStar += Math.max(0, rules[d].required - points);
-            } else {
-                totalMinToAllStar += rules[d].allowed;
-                totalMaxToAllStar += rules[d].required;
+        for (let d of order) {
+            if (d === div) reached = true;
+            if (reached) {
+                if (d === div) {
+                    minToAllStar += Math.max(0, rules[d].allowed - points);
+                    maxToAllStar += Math.max(0, rules[d].required - points);
+                } else {
+                    minToAllStar += rules[d].allowed;
+                    maxToAllStar += rules[d].required;
+                }
             }
         }
-        if (d === "Advanced") break; // Itt állunk meg, mert az Advanced pontok után leszel All Star
+
+        let allStarHtml = "<strong>ÚT AZ ALL STAR-IG</strong><br>";
+        if (div === "All Star") {
+            allStarHtml += "Küldetés teljesítve! 🥂";
+        } else {
+            allStarHtml += `Minimum: <span class="highlight">${minToAllStar}</span> pont kell.<br>`;
+            allStarHtml += `Maximum: <span class="highlight">${maxToAllStar}</span> pont kell.`;
+            allStarHtml += `<span class="small-hint">Min: ha mindig a leghamarabb (Allowed) váltasz.</span>`;
+        }
+        document.getElementById('allStarResult').innerHTML = allStarHtml;
     }
 
-    let allStarHtml = "<strong>Út az All Star-ig:</strong><br>";
-    if (currentDiv === "All Star") {
-        allStarHtml += "Gratulálunk, elérted a célodat!";
-    } else {
-        allStarHtml += `Összesen még minimum <span class="highlight">${totalMinToAllStar}</span> pont kell (ha mindig a legkorábban lépsz szintet).<br>`;
-        allStarHtml += `Összesen maximum <span class="highlight">${totalMaxToAllStar}</span> pont kell (ha minden szintet kimaxolsz a kényszerítésig).`;
-    }
-    document.getElementById('allStarResult').innerHTML = allStarHtml;
-}
-
-calculate();
+    calculate(); // Első futtatás
 </script>
 
 </body>
