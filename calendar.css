@@ -80,6 +80,7 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
     border-right: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 20px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+.sidebar.collapsed { width: 0; min-width: 0; padding: 0; overflow: hidden; border: none; }
 @media (min-height: 600px) { .sidebar { position: sticky; top: 50px; height: calc(100vh - 50px); } }
 
 .sidebar-logo { color: var(--hfs-red); font-size: 1.5em; margin-bottom: 10px; font-weight: 900; text-transform: uppercase; }
@@ -220,6 +221,7 @@ body.calendar-page { overflow-y: auto !important; height: auto; }
         border-radius: 4px;
     }
 }
+
 
 
 
