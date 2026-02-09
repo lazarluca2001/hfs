@@ -282,16 +282,17 @@ body.calendar-page {
         left: 0; 
         height: calc(100vh - 50px); 
         z-index: 1000; 
-        transform: translateX(-100%); 
+        transform: translateX(-100%);
+        width: 100%; 
     }
     
     .sidebar.open { 
         transform: translateX(0); 
-        width: 280px; 
+        width: 100%; 
     }
 
     .calendar-section { 
-        overflow-x: hidden; /* Tiltjuk az oldalsó görgetést */
+        overflow: auto;
         padding: 5px;
     }
 
@@ -366,4 +367,5 @@ body.calendar-page {
     .month-display { font-size: 1.4em; }
     .nav-btn { width: 30px; height: 30px; }
 }
+
 
