@@ -1,3 +1,5 @@
+/* jshint esversion: 11 */
+
 /* --- KONFIGURÁCIÓ & CACHE --- */
 const CONFIG = {
     url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSDDBNbIkZize7hPMfYPovbLgnIFWNuseLg0mjzDYGhLCwEEiF_-CiXnV76lgg2mvb54QabZ8y3Sork/pub?gid=338581218&single=true&output=csv',
@@ -19,7 +21,7 @@ const parseDate = (d) => {
         const p = clean.split('.');
         return p.length === 3 ? new Date(p[0], p[1] - 1, p[2]) : null;
     })();
-    return dt && !isNaN(dt) ? dt.setHours(0,0,0,0) : null;
+    return dt && !isNaN(dt) ? dt.setHours(0, 0, 0, 0) : null;
 };
 
 /* --- ADATOK BETÖLTÉSE --- */
@@ -33,13 +35,17 @@ async function initCalendar() {
         if (headerIndex === -1) return;
 
         const headers = rows[headerIndex];
+        const eventIdx = headers.indexOf('Event');
+        const startIdx = headers.indexOf('Start date');
+        const endIdx = headers.indexOf('End date');
+
         allEvents = rows.slice(headerIndex + 1)
-            .filter(r => r[headers.indexOf('Event')])
+            .filter(r => r[eventIdx])
             .map(row => {
                 const obj = {};
-                headers.forEach((h, i) => obj[h] = row[i]);
-                obj._startTs = parseDate(obj["Start date"]);
-                obj._endTs = parseDate(obj["End date"]) || obj._startTs;
+                headers.forEach((h, i) => { obj[h] = row[i]; });
+                obj._startTs = parseDate(row[startIdx]);
+                obj._endTs = parseDate(row[endIdx]) || obj._startTs;
                 return obj;
             })
             .filter(e => e._startTs);
@@ -65,9 +71,10 @@ function render(m) {
     
     const fragment = document.createDocumentFragment();
     cal.innerHTML = '';
-    document.getElementById('currentMonthHeader').innerText = CONFIG.months[m];
+    const monthHeader = document.getElementById('currentMonthHeader');
+    if (monthHeader) monthHeader.innerText = CONFIG.months[m];
 
-    // Fejléc (Napok)
+    // Fejléc (Napok nevei)
     CONFIG.weekdays.forEach(d => {
         const div = document.createElement('div');
         div.className = 'weekday';
@@ -77,9 +84,9 @@ function render(m) {
 
     const firstDay = (new Date(2026, m, 1).getDay() + 6) % 7;
     const daysInMonth = new Date(2026, m + 1, 0).getDate();
-    const todayTs = new Date().setHours(0,0,0,0);
+    const todayTs = new Date().setHours(0, 0, 0, 0);
 
-    // Üres napok (Pre)
+    // Üres napok (Pre-padding)
     for (let i = 0; i < firstDay; i++) {
         const div = document.createElement('div');
         div.className = 'day empty-day-pre';
@@ -88,7 +95,7 @@ function render(m) {
 
     // Napok generálása
     for (let d = 1; d <= daysInMonth; d++) {
-        const currTs = new Date(2026, m, d).setHours(0,0,0,0);
+        const currTs = new Date(2026, m, d).setHours(0, 0, 0, 0);
         const dayEvents = allEvents.filter(e => currTs >= e._startTs && currTs <= e._endTs);
 
         const dayDiv = document.createElement('div');
@@ -117,8 +124,9 @@ function render(m) {
         fragment.appendChild(dayDiv);
     }
 
-    // Üres napok (Post)
-    const remaining = (7 - ((firstDay + daysInMonth) % 7)) % 7;
+    // Üres napok (Post-padding)
+    const totalCells = firstDay + daysInMonth;
+    const remaining = (7 - (totalCells % 7)) % 7;
     for (let i = 0; i < remaining; i++) {
         const div = document.createElement('div');
         div.className = 'day empty-day-post';
@@ -153,7 +161,7 @@ function updateNext() {
     const box = document.getElementById('nextEventContent');
     if (!box) return;
 
-    const now = new Date().setHours(0,0,0,0);
+    const now = new Date().setHours(0, 0, 0, 0);
     const next = allEvents
         .filter(e => e._endTs >= now)
         .sort((a, b) => a._startTs - b._startTs)[0];
@@ -177,35 +185,46 @@ function updateNext() {
 function renderFilter() {
     const box = document.getElementById('memberFilter');
     if (!box) return;
+    
+    // Sablon alapú generálás a loop-on belüli funkció-deklaráció elkerülésére
     box.innerHTML = Object.entries(CONFIG.members).map(([name, emoji]) => `
-        <div class="filter-btn ${activeFilter === name ? 'active' : ''}" onclick="toggleFilter('${name}')">
+        <div class="filter-btn ${activeFilter === name ? 'active' : ''}" data-name="${name}">
             <span>${emoji}</span> ${name}
         </div>
     `).join('');
-}
 
-window.toggleFilter = (name) => {
-    activeFilter = activeFilter === name ? null : name;
-    renderFilter();
-    render(currentMonthIdx);
-};
+    // Eseménykezelők delegálása
+    box.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.onclick = () => {
+            const name = btn.getAttribute('data-name');
+            activeFilter = activeFilter === name ? null : name;
+            renderFilter();
+            render(currentMonthIdx);
+        };
+    });
+}
 
 function setupMonthSelect() {
     const sel = document.getElementById('monthSelect');
     if (!sel) return;
     sel.innerHTML = CONFIG.months.map((m, i) => `<option value="${i}" ${i === currentMonthIdx ? 'selected' : ''}>${m}</option>`).join('');
-    sel.onchange = e => { currentMonthIdx = parseInt(e.target.value); render(currentMonthIdx); };
+    sel.onchange = e => { 
+        currentMonthIdx = parseInt(e.target.value, 10); 
+        render(currentMonthIdx); 
+    };
 }
 
 window.changeMonth = (d) => {
     currentMonthIdx = (currentMonthIdx + d + 12) % 12;
-    document.getElementById('monthSelect').value = currentMonthIdx;
+    const sel = document.getElementById('monthSelect');
+    if (sel) sel.value = currentMonthIdx;
     render(currentMonthIdx);
 };
 
 window.goToToday = () => {
     currentMonthIdx = new Date().getMonth();
-    document.getElementById('monthSelect').value = currentMonthIdx;
+    const sel = document.getElementById('monthSelect');
+    if (sel) sel.value = currentMonthIdx;
     render(currentMonthIdx);
 };
 
@@ -214,9 +233,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initCalendar();
     
-    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+    const toggleBtn = document.getElementById('sidebarToggle');
+    toggleBtn?.addEventListener('click', () => {
         const sb = document.getElementById('sidebar');
-        sb.classList.toggle(window.innerWidth <= 1024 ? 'open' : 'collapsed');
+        if (sb) sb.classList.toggle(window.innerWidth <= 1024 ? 'open' : 'collapsed');
     });
 });
 
@@ -232,5 +252,3 @@ function initTheme() {
         localStorage.setItem('theme', theme);
     };
 }
-
-
