@@ -37,7 +37,10 @@ async function initCalendar() {
         const rows = csv.split('\n').map(r => r.split(',').map(c => c.replace(/"/g, '').trim()));
         
         const headerIndex = rows.findIndex(r => r.includes('Event'));
-        if (headerIndex === -1) return;
+        if (headerIndex === -1) {
+            console.error("Nem található 'Event' oszlop a CSV-ben!");
+            return;
+        }
 
         const headers = rows[headerIndex];
         const eventIdx = headers.indexOf('Event');
@@ -55,20 +58,19 @@ async function initCalendar() {
             })
             .filter(e => e._startTs);
 
-        // NAPTÁR OLDAL FUNKCIÓI
+        // --- CSAK AZUTÁN INDÍTJUK AZ UI-T, HOGY AZ ADATOK MEGÉRKEZTEK ---
         if (document.getElementById('calendar')) {
             renderFilter();
             setupMonthSelect();
             updateUI();
         }
         
-        // INDEX OLDAL FUNKCIÓI
         if (document.getElementById('compEvent')) {
             populateEventDropdown();
         }
 
     } catch (e) {
-        console.error("Betöltési hiba:", e);
+        console.error("Hálózati vagy feldolgozási hiba:", e);
     }
 }
 
@@ -166,28 +168,38 @@ function updateNext() {
 
 function toggleNextSection(type) {
     if (type === 'semi') {
-        const isPassing = document.getElementById('p_pass').checked;
+        const checkbox = document.getElementById('p_pass');
+        if (!checkbox) return;
+        const isPassing = checkbox.checked;
         document.getElementById('section-semi').style.display = isPassing ? 'block' : 'none';
         if (!isPassing) {
             document.getElementById('s_pass').checked = false;
             toggleNextSection('final');
         }
     } else if (type === 'final') {
-        const isPassing = document.getElementById('s_pass').checked;
+        const checkbox = document.getElementById('s_pass');
+        if (!checkbox) return;
+        const isPassing = checkbox.checked;
         document.getElementById('section-final').style.display = isPassing ? 'block' : 'none';
         if (isPassing) generateJudgeInputs();
     }
 }
 
 function calcPrelim(prefix) {
-    const y = parseInt(document.getElementById(`${prefix}_vYes`).value) || 0;
-    const a1 = parseInt(document.getElementById(`${prefix}_vAlt1`).value) || 0;
+    const yVal = document.getElementById(`${prefix}_vYes`) ? document.getElementById(`${prefix}_vYes`).value : 0;
+    const aVal = document.getElementById(`${prefix}_vAlt1`) ? document.getElementById(`${prefix}_vAlt1`).value : 0;
+    
+    const y = parseInt(yVal) || 0;
+    const a1 = parseInt(aVal) || 0;
     const score = (y * 10) + (a1 * 7);
-    document.getElementById(`${prefix}_score`).innerText = `Pontszám: ${score}`;
+    const scoreElem = document.getElementById(`${prefix}_score`);
+    if (scoreElem) scoreElem.innerText = `Pontszám: ${score}`;
 }
 
 function generateJudgeInputs() {
-    const count = document.getElementById('finalJudgeCount').value;
+    const countInput = document.getElementById('finalJudgeCount');
+    if (!countInput) return;
+    const count = countInput.value;
     const container = document.getElementById('judgeInputsContainer');
     if(!container) return;
     container.innerHTML = '';
@@ -210,15 +222,22 @@ function runRelativePlacement() {
         }
     }
 
-    const count = parseInt(document.getElementById('competitorCount').value) || 0;
+    const compCountInput = document.getElementById('competitorCount');
+    const count = compCountInput ? parseInt(compCountInput.value) : 0;
+    
     let tier = 0;
     if (count >= 130) tier = 6; else if (count >= 80) tier = 5; else if (count >= 40) tier = 4;
     else if (count >= 20) tier = 3; else if (count >= 11) tier = 2; else if (count >= 5) tier = 1;
 
     const points = (TIER_TABLE[tier] && TIER_TABLE[tier][finalPlace - 1]) || 0;
-    document.getElementById('finalResultDisplay').style.display = 'block';
-    document.getElementById('finalPlaceText').innerText = `Helyezés: ${finalPlace}.`;
-    document.getElementById('wsdcPointsEarned').innerText = `Szerzett WSDC pont: ${points}`;
+    
+    const displayBox = document.getElementById('finalResultDisplay');
+    const placeText = document.getElementById('finalPlaceText');
+    const pointsText = document.getElementById('wsdcPointsEarned');
+
+    if (displayBox) displayBox.style.display = 'block';
+    if (placeText) placeText.innerText = `Helyezés: ${finalPlace}.`;
+    if (pointsText) pointsText.innerText = `Szerzett WSDC pont: ${points}`;
 }
 
 function populateEventDropdown() {
@@ -232,16 +251,36 @@ function populateEventDropdown() {
             const d = new Date(ev._startTs);
             const diff = (d.getDay() <= 6) ? (6 - d.getDay()) : 0;
             d.setDate(d.getDate() + diff);
-            document.getElementById('compDate').value = d.toISOString().split('T')[0];
+            const dateInput = document.getElementById('compDate');
+            if (dateInput) dateInput.value = d.toISOString().split('T')[0];
         }
     };
+}
+
+// --- SZŰRŐ RENDERELÉS ---
+function renderFilter() {
+    const box = document.getElementById('memberFilter');
+    if (!box) return;
+    box.innerHTML = Object.entries(CONFIG.members).map(([name, emoji]) => `
+        <div class="filter-btn ${activeFilter === name ? 'active' : ''}" data-name="${name}">
+            <span>${emoji}</span> ${name}
+        </div>
+    `).join('');
+
+    box.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.onclick = () => {
+            const name = btn.getAttribute('data-name');
+            activeFilter = activeFilter === name ? null : name;
+            renderFilter();
+            render(currentMonthIdx);
+        };
+    });
 }
 
 /* --- INIT --- */
 document.addEventListener('DOMContentLoaded', () => {
     initCalendar();
     
-    // Téma kapcsoló inicializálása mindkét oldalon
     const themeToggle = document.getElementById('theme-toggle') || document.getElementById('checkbox');
     if(themeToggle) {
         const isDark = localStorage.getItem('theme') === 'dark';
@@ -254,7 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // Sidebar toggle (mobilhoz)
     document.getElementById('sidebarToggle')?.addEventListener('click', () => {
         document.getElementById('sidebar')?.classList.toggle('open');
     });
