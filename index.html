@@ -1,185 +1,5 @@
-<!DOCTYPE html>
-<html lang="hu">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HFS Dashboard | WSDC Központ</title>
-    <style>
-        /* --- HFS GLOBÁLIS STÍLUSOK --- */
-        :root {
-            --hfs-red: #800000;
-            --hfs-red-hover: #a00000;
-            --hfs-light-red: #fff0f0;
-            --bg-color: #f4f4f4;
-            --card-bg: #ffffff;
-            --text-color: #333;
-            --border-color: #ddd;
-            --nav-bg: #ffffff;
-            --shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #0a0a0a;
-            --card-bg: #1a1a1a;
-            --text-color: #f0f0f0;
-            --border-color: #333;
-            --nav-bg: #1e1e1e;
-            --hfs-red: #ff4d4d;
-            --hfs-light-red: #2d1a1a;
-        }
-
-        * { box-sizing: border-box; }
-        body {
-            margin: 0; font-family: 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg-color); color: var(--text-color);
-            transition: background 0.3s, color 0.3s;
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-            padding-top: 70px;
-        }
-
-        /* Navigáció */
-        .fixed-nav {
-            position: fixed; top: 0; left: 0; right: 0; height: 50px;
-            background: var(--nav-bg); border-bottom: 1px solid var(--border-color);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; z-index: 1100; box-shadow: var(--shadow);
-        }
-        .fixed-nav a { color: var(--hfs-red); text-decoration: none; font-weight: bold; margin-right: 15px; font-size: 0.9em; }
-
-        /* Kártya stílus */
-        .container { width: 95%; max-width: 650px; padding-bottom: 50px; }
-        .sidebar-logo { color: var(--hfs-red); font-size: 1.8em; margin-bottom: 20px; font-weight: 900; text-transform: uppercase; text-align: center; }
-        .card { background: var(--card-bg); border-radius: 16px; padding: 25px; box-shadow: var(--shadow); border: 1px solid var(--border-color); margin-bottom: 20px; }
-        
-        h3 { margin-top: 0; color: var(--hfs-red); font-size: 1.1em; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-        label { display: block; margin-top: 15px; font-weight: bold; font-size: 0.75em; color: var(--hfs-red); text-transform: uppercase; }
-        
-        select, input { padding: 12px; margin: 8px 0; width: 100%; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1em; }
-        .grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
-        /* Eredmény dobozok */
-        .result-box { margin-top: 15px; padding: 15px; border-radius: 12px; border-left: 5px solid var(--hfs-red); background: var(--hfs-light-red); }
-        .section-green { border-left-color: #2ecc40; background: rgba(46, 204, 64, 0.05); }
-        .section-gold { border-left-color: #ffdc00; background: rgba(255, 220, 0, 0.05); }
-        
-        .highlight { font-weight: 800; color: var(--hfs-red); }
-        .calc-btn { background: var(--hfs-red); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        
-        /* Relative Placement rács */
-        .judge-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .rp-input { width: 55px !important; text-align: center; }
-
-        /* Theme Switch */
-        .theme-switch { position: relative; display: inline-block; width: 40px; height: 20px; }
-        .theme-switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--hfs-red); }
-        input:checked + .slider:before { transform: translateX(20px); }
-    </style>
-</head>
-<body>
-
-<nav class="fixed-nav">
-    <div class="nav-links">
-        <a href="index.html">DASHBOARD</a>
-        <a href="naptar.html">NAPTÁR 🗓️</a>
-    </div>
-    <div style="display: flex; align-items: center; gap: 10px; font-size: 0.8em;">
-        <span>SÖTÉT MÓD</span>
-        <label class="theme-switch">
-            <input type="checkbox" id="theme-toggle">
-            <span class="slider"></span>
-        </label>
-    </div>
-</nav>
-
-<div class="container">
-    <div class="sidebar-logo">All Star Központ</div>
-
-    <div class="card">
-        <h3>Szintlépés Állapota</h3>
-        <label>Tag kiválasztása</label>
-        <select id="memberSelect" onchange="loadMemberData()">
-            <option value="custom">-- Egyéni pontbevitel --</option>
-        </select>
-
-        <div class="grid-row">
-            <div>
-                <label>Aktuális Divízió</label>
-                <select id="currentDivision" onchange="calculate()">
-                    <option>Newcomer</option>
-                    <option>Novice</option>
-                    <option>Intermediate</option>
-                    <option>Advanced</option>
-                </select>
-            </div>
-            <div>
-                <label>Jelenlegi pontok</label>
-                <input type="number" id="currentPoints" value="0" oninput="calculate()">
-            </div>
-        </div>
-        <div id="nextLevelResult" class="result-box"></div>
-    </div>
-
-    <div class="card">
-        <h3>Verseny Eredmény Naplózás</h3>
-        
-        <div class="grid-row">
-            <div>
-                <label>Esemény</label>
-                <select id="compEvent"></select>
-            </div>
-            <div>
-                <label>Indulók (párok)</label>
-                <input type="number" id="competitorCount" placeholder="Pl. 35" oninput="updateTierInfo()">
-            </div>
-        </div>
-
-        <div id="section-prelim" class="result-box section-green">
-            <label style="margin-top:0">1. Forduló: PRELIM</label>
-            <div class="grid-row">
-                <input type="number" id="p_vYes" placeholder="Yes" oninput="calcPrelim('p')">
-                <input type="number" id="p_vAlt1" placeholder="Alt1" oninput="calcPrelim('p')">
-            </div>
-            <p id="p_score" style="font-weight:bold">Pontszám: 0</p>
-            <label style="color:var(--text-color); font-size: 0.75em; cursor:pointer">
-                <input type="checkbox" id="p_pass" onchange="toggleNextSection('semi')"> TOVÁBBJUTOTTAM A SEMI-BE
-            </label>
-        </div>
-
-        <div id="section-semi" class="result-box section-green" style="display:none; border-left-color: #3498db; background: rgba(52, 152, 219, 0.05);">
-            <label style="margin-top:0">2. Forduló: SEMI</label>
-            <div class="grid-row">
-                <input type="number" id="s_vYes" placeholder="Yes" oninput="calcPrelim('s')">
-                <input type="number" id="s_vAlt1" placeholder="Alt1" oninput="calcPrelim('s')">
-            </div>
-            <p id="s_score" style="font-weight:bold">Pontszám: 0</p>
-            <label style="color:var(--text-color); font-size: 0.75em; cursor:pointer">
-                <input type="checkbox" id="s_pass" onchange="toggleNextSection('final')"> TOVÁBBJUTOTTAM A DÖNTŐBE
-            </label>
-        </div>
-
-        <div id="section-final" class="result-box section-gold" style="display:none;">
-            <label style="margin-top:0">3. Forduló: DÖNTŐ (Relative Placement)</label>
-            <label>Bírók száma (páratlan)</label>
-            <input type="number" id="finalJudgeCount" value="5" min="3" step="2" oninput="generateJudgeInputs()">
-            
-            <div id="judgeInputsContainer" class="judge-grid"></div>
-            
-            <button class="calc-btn" onclick="runRelativePlacement()">Végeredmény Kiszámítása</button>
-        </div>
-
-        <div id="finalResultDisplay" class="result-box" style="display:none;">
-            <p class="highlight" id="finalPlaceText" style="font-size:1.4em; margin:0"></p>
-            <p id="wsdcPointsEarned" style="font-weight:bold; color: #2ecc40; margin-top:5px;"></p>
-        </div>
-    </div>
-</div>
-
-<script src="script.js"></script>
 <script>
-    // --- ADATOK ÉS KALKULÁCIÓS LOGIKA ---
+    /* --- LOKÁLIS KALKULÁCIÓS ADATOK --- */
     const hfsStats = [
         { name: "Ferenczi Csongor", div: "Intermediate", points: 19 },
         { name: "Bende Márton", div: "Novice", points: 15 },
@@ -195,8 +15,112 @@
         "Advanced": { allowed: 60, required: 90, next: "All Star" }
     };
 
+    const TIER_TABLE = {
+        1: [3, 2, 1], 2: [6, 4, 3, 2, 1], 3: [10, 8, 6, 4, 2, 1],
+        4: [15, 12, 10, 8, 6, 1], 5: [20, 16, 14, 12, 10, 2], 6: [25, 22, 18, 15, 12, 2]
+    };
+
+    /* --- INICIALIZÁLÁS --- */
     function initDashboard() {
         const sel = document.getElementById('memberSelect');
-        hfsStats.forEach((m, i) => sel.add(new Option(m.name, i)));
+        if (sel) hfsStats.forEach((m, i) => sel.add(new Option(m.name, i)));
         
-        // Sötét
+        const themeToggle = document.getElementById('theme-toggle');
+        const isDark = localStorage.getItem('theme') === 'dark';
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        if(themeToggle) {
+            themeToggle.checked = isDark;
+            themeToggle.onchange = (e) => {
+                const theme = e.target.checked ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+            };
+        }
+    }
+
+    /* --- KALKULÁTOR LOGIKA --- */
+    function loadMemberData() {
+        const idx = document.getElementById('memberSelect').value;
+        if(idx !== "custom") {
+            document.getElementById('currentDivision').value = hfsStats[idx].div;
+            document.getElementById('currentPoints').value = hfsStats[idx].points;
+        }
+        calculate();
+    }
+
+    function calculate() {
+        const div = document.getElementById('currentDivision').value;
+        const pts = parseInt(document.getElementById('currentPoints').value) || 0;
+        const rule = wsdcRules[div];
+        if(!rule) return;
+
+        let aDiff = Math.max(0, rule.allowed - pts);
+        let rDiff = Math.max(0, rule.required - pts);
+        
+        document.getElementById('nextLevelResult').innerHTML = `
+            <strong>KÖVETKEZŐ SZINT: ${rule.next.toUpperCase()}</strong><br>
+            Szintlépés lehetséges: <span class="highlight">${aDiff}</span> pont múlva.<br>
+            Szintlépés kötelező: <span class="highlight">${rDiff}</span> pont múlva.`;
+    }
+
+    /* --- VERSENY NAPLÓZÓ LOGIKA --- */
+    function toggleNextSection(type) {
+        if (type === 'semi') {
+            const isPassing = document.getElementById('p_pass').checked;
+            document.getElementById('section-semi').style.display = isPassing ? 'block' : 'none';
+            if (!isPassing) {
+                document.getElementById('s_pass').checked = false;
+                toggleNextSection('final');
+            }
+        } else if (type === 'final') {
+            const isPassing = document.getElementById('s_pass').checked;
+            document.getElementById('section-final').style.display = isPassing ? 'block' : 'none';
+            if (isPassing) generateJudgeInputs();
+        }
+    }
+
+    function calcPrelim(prefix) {
+        const y = parseInt(document.getElementById(`${prefix}_vYes`).value) || 0;
+        const a1 = parseInt(document.getElementById(`${prefix}_vAlt1`).value) || 0;
+        // Javítás: Pont használata vessző helyett és csak létező mezők számítása
+        const score = (y * 10) + (a1 * 4.5);
+        document.getElementById(`${prefix}_score`).innerText = `Pontszám: ${score}`;
+    }
+
+    function generateJudgeInputs() {
+        const count = document.getElementById('finalJudgeCount').value;
+        const container = document.getElementById('judgeInputsContainer');
+        container.innerHTML = '';
+        for (let i = 1; i <= count; i++) {
+            container.innerHTML += `<input type="number" class="rp-input" placeholder="J${i}" style="width:55px; margin:2px;">`;
+        }
+    }
+
+    function runRelativePlacement() {
+        const inputs = document.querySelectorAll('.rp-input');
+        const scores = Array.from(inputs).map(i => parseInt(i.value)).filter(v => !isNaN(v));
+        if (scores.length < 3) return alert("Kérlek add meg a bírói helyezéseket!");
+
+        const majority = Math.ceil(scores.length / 2);
+        let finalPlace = 0;
+        for (let p = 1; p <= 20; p++) {
+            if (scores.filter(s => s <= p).length >= majority) {
+                finalPlace = p;
+                break;
+            }
+        }
+
+        const count = parseInt(document.getElementById('competitorCount').value) || 0;
+        let tier = 0;
+        if (count >= 130) tier = 6; else if (count >= 80) tier = 5; else if (count >= 40) tier = 4;
+        else if (count >= 20) tier = 3; else if (count >= 11) tier = 2; else if (count >= 5) tier = 1;
+
+        const points = (TIER_TABLE[tier] && TIER_TABLE[tier][finalPlace - 1]) || 0;
+
+        document.getElementById('finalResultDisplay').style.display = 'block';
+        document.getElementById('finalPlaceText').innerText = `Végső helyezés: ${finalPlace}.`;
+        document.getElementById('wsdcPointsEarned').innerText = `Szerzett WSDC pont: ${points}`;
+    }
+
+    window.addEventListener('DOMContentLoaded', initDashboard);
+</script>
