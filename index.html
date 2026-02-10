@@ -229,7 +229,7 @@
         let rDiff = Math.max(0, rule.required - pts);
         
         // XP sáv frissítése
-        const percent = Math.min(100, (pts / rule.required) * 100);
+        const percent = Math.min(100, (pts / rule.allowed) * 100);
         document.getElementById('xpBar').style.width = percent + "%";
 
         document.getElementById('nextLevelResult').innerHTML = `Következő: <strong>${rule.next}</strong> | Lehetséges: ${aDiff} p | Kötelező: ${rDiff} p`;
