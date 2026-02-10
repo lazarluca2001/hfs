@@ -135,24 +135,32 @@
         </div>
 
         <div id="section-prelim" class="result-box section-green">
-            <label>1. Forduló: PRELIM</label>
-            <div class="grid-row">
-                <input type="number" id="p_vYes" placeholder="Yes" oninput="calcPrelim('p')">
-                <input type="number" id="p_vAlt1" placeholder="Alt1" oninput="calcPrelim('p')">
-            </div>
-            <p id="p_score">Pontszám: 0</p>
-            <label><input type="checkbox" id="p_pass" onchange="toggleNextSection('semi')"> TOVÁBBJUTOTTAM A SEMI-BE</label>
-        </div>
+    <label style="margin-top:0">1. Forduló: PRELIM</label>
+    <div class="grid-row" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
+        <div><label>Yes</label><input type="number" id="p_vYes" placeholder="0" oninput="calcPrelim('p')"></div>
+        <div><label>Alt1</label><input type="number" id="p_vAlt1" placeholder="0" oninput="calcPrelim('p')"></div>
+        <div><label>Alt2</label><input type="number" id="p_vAlt2" placeholder="0" oninput="calcPrelim('p')"></div>
+        <div><label>Alt3</label><input type="number" id="p_vAlt3" placeholder="0" oninput="calcPrelim('p')"></div>
+    </div>
+    <p id="p_score" style="font-weight:bold; margin-top: 10px;">Pontszám: 0</p>
+    <label style="color:var(--text-color); font-size: 0.75em; cursor:pointer; display: flex; align-items: center; gap: 8px;">
+        <input type="checkbox" id="p_pass" onchange="toggleNextSection('semi')"> TOVÁBBJUTOTTAM A SEMI-BE
+    </label>
+</div>
 
-        <div id="section-semi" class="result-box section-green" style="display:none;">
-            <label>2. Forduló: SEMI</label>
-            <div class="grid-row">
-                <input type="number" id="s_vYes" placeholder="Yes" oninput="calcPrelim('s')">
-                <input type="number" id="s_vAlt1" placeholder="Alt1" oninput="calcPrelim('s')">
-            </div>
-            <p id="s_score">Pontszám: 0</p>
-            <label><input type="checkbox" id="s_pass" onchange="toggleNextSection('final')"> TOVÁBBJUTOTTAM A DÖNTŐBE</label>
-        </div>
+<div id="section-semi" class="result-box section-green" style="display:none; border-left-color: #3498db; background: rgba(52, 152, 219, 0.05);">
+    <label style="margin-top:0">2. Forduló: SEMI</label>
+    <div class="grid-row" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
+        <div><label>Yes</label><input type="number" id="s_vYes" placeholder="0" oninput="calcPrelim('s')"></div>
+        <div><label>Alt1</label><input type="number" id="s_vAlt1" placeholder="0" oninput="calcPrelim('s')"></div>
+        <div><label>Alt2</label><input type="number" id="s_vAlt2" placeholder="0" oninput="calcPrelim('s')"></div>
+        <div><label>Alt3</label><input type="number" id="s_vAlt3" placeholder="0" oninput="calcPrelim('s')"></div>
+    </div>
+    <p id="s_score" style="font-weight:bold; margin-top: 10px;">Pontszám: 0</p>
+    <label style="color:var(--text-color); font-size: 0.75em; cursor:pointer; display: flex; align-items: center; gap: 8px;">
+        <input type="checkbox" id="s_pass" onchange="toggleNextSection('final')"> TOVÁBBJUTOTTAM A DÖNTŐBE
+    </label>
+</div>
 
         <div id="section-final" class="result-box section-gold" style="display:none;">
             <label>3. Forduló: DÖNTŐ</label>
