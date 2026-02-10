@@ -1,5 +1,3 @@
-/* jshint esversion: 11 */
-
 /* --- KONFIGURÁCIÓ & ADATOK --- */
 const CONFIG = {
     url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSDDBNbIkZize7hPMfYPovbLgnIFWNuseLg0mjzDYGhLCwEEiF_-CiXnV76lgg2mvb54QabZ8y3Sork/pub?gid=338581218&single=true&output=csv',
