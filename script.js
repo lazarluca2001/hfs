@@ -1,12 +1,29 @@
 /* jshint esversion: 11 */
 
-/* --- KONFIGURÁCIÓ & CACHE --- */
+/* --- KONFIGURÁCIÓ & ADATOK --- */
 const CONFIG = {
     url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSDDBNbIkZize7hPMfYPovbLgnIFWNuseLg0mjzDYGhLCwEEiF_-CiXnV76lgg2mvb54QabZ8y3Sork/pub?gid=338581218&single=true&output=csv',
     members: {"Csongi":"🌈","Merci":"🦆","Mózes":"🦄","Luca":"🐶","Zoli":"🕺"},
     validStatuses: ["igen", "talán", "talan", "fizetve", "igazolt"],
     months: ["JANUÁR","FEBRUÁR","MÁRCIUS","ÁPRILIS","MÁJUS","JÚNIUS","JÚLIUS","AUGUSZTUS","SZEPTEMBER","OKTÓBER","NOVEMBER","DECEMBER"],
     weekdays: ["H","K","Sze","Cs","P","Szo","V"]
+};
+
+// WSDC Szabályrendszer adatai
+const WSDC_RULES = {
+    "Newcomer": { allowed: 0, required: 1, next: "Novice" },
+    "Novice": { allowed: 16, required: 30, next: "Intermediate" },
+    "Intermediate": { allowed: 30, required: 45, next: "Advanced" },
+    "Advanced": { allowed: 60, required: 90, next: "All Star" }
+};
+
+const TIER_TABLE = {
+    1: [3, 2, 1], 
+    2: [6, 4, 3, 2, 1], 
+    3: [10, 8, 6, 4, 2, 1],
+    4: [15, 12, 10, 8, 6, 1], 
+    5: [20, 16, 14, 12, 10, 2], 
+    6: [25, 22, 18, 15, 12, 2]
 };
 
 let allEvents = [];
@@ -24,7 +41,7 @@ const parseDate = (d) => {
     return dt && !isNaN(dt) ? dt.setHours(0, 0, 0, 0) : null;
 };
 
-/* --- ADATOK BETÖLTÉSE --- */
+/* --- NAPTÁR ADATOK BETÖLTÉSE --- */
 async function initCalendar() {
     try {
         const res = await fetch(CONFIG.url);
@@ -50,15 +67,22 @@ async function initCalendar() {
             })
             .filter(e => e._startTs);
 
-        renderFilter();
-        setupMonthSelect();
-        updateUI();
+        // UI frissítése, ha naptár oldalon vagyunk
+        if (document.getElementById('calendar')) {
+            renderFilter();
+            setupMonthSelect();
+            updateUI();
+        }
+        
+        // Dropdown feltöltése, ha index oldalon vagyunk
+        populateEventDropdown();
+
     } catch (e) {
-        console.error("Betöltési hiba:", e);
+        console.error("Hiba az adatok betöltésekor:", e);
     }
 }
 
-/* --- UI RENDERELÉS --- */
+/* --- NAPTÁR UI RENDERELÉS --- */
 function updateUI() {
     render(currentMonthIdx);
     updateNext();
@@ -74,7 +98,6 @@ function render(m) {
     const monthHeader = document.getElementById('currentMonthHeader');
     if (monthHeader) monthHeader.innerText = CONFIG.months[m];
 
-    // Fejléc (Napok nevei)
     CONFIG.weekdays.forEach(d => {
         const div = document.createElement('div');
         div.className = 'weekday';
@@ -86,14 +109,12 @@ function render(m) {
     const daysInMonth = new Date(2026, m + 1, 0).getDate();
     const todayTs = new Date().setHours(0, 0, 0, 0);
 
-    // Üres napok (Pre-padding)
     for (let i = 0; i < firstDay; i++) {
         const div = document.createElement('div');
         div.className = 'day empty-day-pre';
         fragment.appendChild(div);
     }
 
-    // Napok generálása
     for (let d = 1; d <= daysInMonth; d++) {
         const currTs = new Date(2026, m, d).setHours(0, 0, 0, 0);
         const dayEvents = allEvents.filter(e => currTs >= e._startTs && currTs <= e._endTs);
@@ -123,21 +144,10 @@ function render(m) {
         });
         fragment.appendChild(dayDiv);
     }
-
-    // Üres napok (Post-padding)
-    const totalCells = firstDay + daysInMonth;
-    const remaining = (7 - (totalCells % 7)) % 7;
-    for (let i = 0; i < remaining; i++) {
-        const div = document.createElement('div');
-        div.className = 'day empty-day-post';
-        div.innerHTML = '&nbsp;'; 
-        fragment.appendChild(div);
-    }
-
     cal.appendChild(fragment);
 }
 
-/* --- STATISZTIKA & ESEMÉNYEK --- */
+/* --- STATISZTIKA ÉS KERESŐ --- */
 function updateActivityChart() {
     const container = document.getElementById('activityChart');
     if (!container) return;
@@ -160,95 +170,88 @@ function updateActivityChart() {
 function updateNext() {
     const box = document.getElementById('nextEventContent');
     if (!box) return;
-
     const now = new Date().setHours(0, 0, 0, 0);
-    const next = allEvents
-        .filter(e => e._endTs >= now)
-        .sort((a, b) => a._startTs - b._startTs)[0];
+    const next = allEvents.filter(e => e._endTs >= now).sort((a, b) => a._startTs - b._startTs)[0];
 
     if (next) {
         const diff = Math.round((next._startTs - now) / 86400000);
-        const dayText = diff > 0 ? `Még ${diff} nap` : (diff === 0 ? "Ma kezdődik! 🔥" : "Folyamatban... 🚀");
-        box.innerHTML = `
-            <div class="next-event-wrapper">
-                <div class="next-event-title">${next.Event}</div>
-                <div class="next-event-info">📍 ${next.Location || 'Ismeretlen'}</div>
-                <div class="next-event-info">🗓️ ${next["Start date"]}</div>
-                <div class="next-event-countdown">${dayText}</div>
-            </div>`;
-    } else {
-        box.innerHTML = "Nincs több esemény.";
+        const dayText = diff > 0 ? `Még ${diff} nap` : (diff === 0 ? "Ma kezdődik! 🔥" : "Folyamatban...");
+        box.innerHTML = `<div class="next-event-title">${next.Event}</div><div class="next-event-countdown">${dayText}</div>`;
     }
 }
 
-/* --- EVENT HANDLERS --- */
-function renderFilter() {
-    const box = document.getElementById('memberFilter');
-    if (!box) return;
-    
-    // Sablon alapú generálás a loop-on belüli funkció-deklaráció elkerülésére
-    box.innerHTML = Object.entries(CONFIG.members).map(([name, emoji]) => `
-        <div class="filter-btn ${activeFilter === name ? 'active' : ''}" data-name="${name}">
-            <span>${emoji}</span> ${name}
-        </div>
-    `).join('');
+/* --- INDEX OLDAL - KALKULÁTOR FUNKCIÓK --- */
+function populateEventDropdown() {
+    const sel = document.getElementById('compEvent');
+    if (!sel || allEvents.length === 0) return;
+    sel.innerHTML = '<option disabled selected>Válassz...</option>';
+    [...new Set(allEvents.map(e => e.Event))].forEach(name => sel.add(new Option(name, name)));
 
-    // Eseménykezelők delegálása
-    box.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.onclick = () => {
-            const name = btn.getAttribute('data-name');
-            activeFilter = activeFilter === name ? null : name;
-            renderFilter();
-            render(currentMonthIdx);
-        };
-    });
+    sel.onchange = (e) => {
+        const ev = allEvents.find(event => event.Event === e.target.value);
+        if (ev && ev._startTs) {
+            const d = new Date(ev._startTs);
+            const diff = (d.getDay() <= 6) ? (6 - d.getDay()) : 0; // Szombat keresése
+            d.setDate(d.getDate() + diff);
+            document.getElementById('compDate').value = d.toISOString().split('T')[0];
+        }
+    };
 }
+
+// Relative Placement Algoritmus
+function runRelativePlacement() {
+    const inputs = document.querySelectorAll('.rp-input');
+    const scores = Array.from(inputs).map(i => parseInt(i.value)).filter(v => !isNaN(v));
+    if (scores.length < 3) return alert("Bírói helyezések szükségesek!");
+
+    const majority = Math.ceil(scores.length / 2);
+    let finalPlace = 0;
+
+    // Relative Placement Rule Logic
+    for (let p = 1; p <= 20; p++) {
+        const count = scores.filter(s => s <= p).length;
+        if (count >= majority) {
+            finalPlace = p;
+            break;
+        }
+    }
+
+    const count = parseInt(document.getElementById('competitorCount').value) || 0;
+    let tier = 0;
+    if(count >= 130) tier = 6; else if(count >= 80) tier = 5; else if(count >= 40) tier = 4;
+    else if(count >= 20) tier = 3; else if(count >= 11) tier = 2; else if(count >= 5) tier = 1;
+
+    const points = (TIER_TABLE[tier] && TIER_TABLE[tier][finalPlace - 1]) || 0;
+
+    document.getElementById('finalResultDisplay').style.display = 'block';
+    document.getElementById('finalPlaceText').innerText = `Helyezés: ${finalPlace}.`;
+    document.getElementById('wsdcPointsEarned').innerText = `Szerzett WSDC pont: ${points}`;
+}
+
+/* --- INIT & ESEMÉNYKEZELŐK --- */
+document.addEventListener('DOMContentLoaded', () => {
+    initCalendar();
+    
+    // Téma kezelés
+    const themeToggle = document.getElementById('theme-toggle') || document.getElementById('checkbox');
+    const isDark = localStorage.getItem('theme') === 'dark';
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    if(themeToggle) {
+        themeToggle.checked = isDark;
+        themeToggle.onchange = () => {
+            const t = themeToggle.checked ? 'dark' : 'light';
+            document.documentElement.dataset.theme = t;
+            localStorage.setItem('theme', t);
+        };
+    }
+});
 
 function setupMonthSelect() {
     const sel = document.getElementById('monthSelect');
     if (!sel) return;
     sel.innerHTML = CONFIG.months.map((m, i) => `<option value="${i}" ${i === currentMonthIdx ? 'selected' : ''}>${m}</option>`).join('');
-    sel.onchange = e => { 
-        currentMonthIdx = parseInt(e.target.value, 10); 
-        render(currentMonthIdx); 
-    };
+    sel.onchange = e => { currentMonthIdx = parseInt(e.target.value, 10); render(currentMonthIdx); };
 }
 
-window.changeMonth = (d) => {
-    currentMonthIdx = (currentMonthIdx + d + 12) % 12;
-    const sel = document.getElementById('monthSelect');
-    if (sel) sel.value = currentMonthIdx;
-    render(currentMonthIdx);
-};
-
-window.goToToday = () => {
-    currentMonthIdx = new Date().getMonth();
-    const sel = document.getElementById('monthSelect');
-    if (sel) sel.value = currentMonthIdx;
-    render(currentMonthIdx);
-};
-
-/* --- INIT --- */
-document.addEventListener('DOMContentLoaded', () => {
-    initTheme();
-    initCalendar();
-    
-    const toggleBtn = document.getElementById('sidebarToggle');
-    toggleBtn?.addEventListener('click', () => {
-        const sb = document.getElementById('sidebar');
-        if (sb) sb.classList.toggle(window.innerWidth <= 1024 ? 'open' : 'collapsed');
-    });
-});
-
-function initTheme() {
-    const toggle = document.getElementById('checkbox');
-    if (!toggle) return;
-    const isDark = localStorage.getItem('theme') === 'dark';
-    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-    toggle.checked = isDark;
-    toggle.onchange = () => {
-        const theme = toggle.checked ? 'dark' : 'light';
-        document.documentElement.dataset.theme = theme;
-        localStorage.setItem('theme', theme);
-    };
-}
+window.changeMonth = (d) => { currentMonthIdx = (currentMonthIdx + d + 12) % 12; render(currentMonthIdx); };
+window.goToToday = () => { currentMonthIdx = new Date().getMonth(); render(currentMonthIdx); };
