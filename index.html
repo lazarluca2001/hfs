@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HFS Master Dashboard | All Star Központ</title>
     <style>
-        /* --- GLOBÁLIS STÍLUSOK ÉS VÁLTOZÓK --- */
         :root {
             --hfs-red: #800000;
             --hfs-red-hover: #a00000;
@@ -37,6 +36,7 @@
             padding-top: 70px;
         }
 
+        /* Navigáció */
         .fixed-nav {
             position: fixed; top: 0; left: 0; right: 0; height: 50px;
             background: var(--nav-bg); border-bottom: 1px solid var(--border-color);
@@ -45,25 +45,64 @@
         }
         .nav-links a { color: var(--hfs-red); text-decoration: none; font-weight: bold; margin-right: 20px; font-size: 0.9em; }
 
-        .container { width: 95%; max-width: 700px; padding-bottom: 50px; }
-        .sidebar-logo { color: var(--hfs-red); font-size: 1.8em; margin-bottom: 20px; font-weight: 900; text-transform: uppercase; text-align: center; }
-        .card { background: var(--card-bg); border-radius: 16px; padding: 25px; box-shadow: var(--shadow); border: 1px solid var(--border-color); margin-bottom: 20px; }
-        
-        h3 { margin-top: 0; color: var(--hfs-red); font-size: 1.1em; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; text-transform: uppercase; }
-        label { display: block; margin-top: 15px; font-weight: bold; font-size: 0.75em; color: var(--hfs-red); text-transform: uppercase; }
-        
-        select, input { padding: 12px; margin: 8px 0; width: 100%; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1em; }
-        .grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        /* Dashboard Elrendezés */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+            width: 95%;
+            max-width: 1200px;
+        }
 
-        .xp-container { width: 100%; height: 12px; background: var(--border-color); border-radius: 6px; margin-top: 10px; overflow: hidden; position: relative; }
-        .xp-bar { height: 100%; background: linear-gradient(90deg, var(--hfs-red), #ff4d4d); width: 0%; transition: width 0.5s ease; }
-
-        .result-box { margin-top: 15px; padding: 15px; border-radius: 12px; border-left: 5px solid var(--hfs-red); background: var(--hfs-light-red); transition: all 0.3s ease; }
-        .section-green { border-left-color: #2ecc40; background: rgba(46, 204, 64, 0.05); }
-        .section-gold { border-left-color: #ffdc00; background: rgba(255, 220, 0, 0.05); }
+        /* Oldalsáv (Sidebar) */
+        .sidebar { display: flex; flex-direction: column; gap: 20px; }
         
-        .highlight { font-weight: 800; color: var(--hfs-red); }
-        .calc-btn { background: var(--hfs-red); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
+        h3 { margin-top: 0; color: var(--hfs-red); font-size: 0.9em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; text-transform: uppercase; }
+
+        /* Aktivitás Grafikon */
+        .activity-chart { display: flex; align-items: flex-end; gap: 8px; height: 100px; padding-top: 10px; justify-content: space-around; }
+        .chart-column-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+        .chart-bar { width: 100%; background: var(--hfs-red); border-radius: 4px 4px 0 0; transition: height 0.5s ease; min-height: 2px; }
+        .chart-emoji { font-size: 1.2em; }
+        .chart-label { font-size: 0.7em; font-weight: bold; }
+
+        /* Következő Állomás */
+        .next-event-title { font-weight: bold; color: var(--hfs-red); margin-bottom: 4px; }
+        .next-event-countdown { font-size: 1.2em; font-weight: 900; }
+
+        /* Szűrők */
+        .filter-group { display: flex; flex-wrap: wrap; gap: 6px; }
+        .filter-btn { 
+            padding: 6px 10px; border-radius: 20px; border: 1px solid var(--border-color); 
+            background: var(--bg-color); cursor: pointer; font-size: 0.8em; transition: 0.2s;
+        }
+        .filter-btn.active { background: var(--hfs-red); color: white; border-color: var(--hfs-red); }
+
+        /* Kalkulátor Form */
+        .main-content { display: flex; flex-direction: column; gap: 20px; }
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.75em; color: var(--hfs-red); text-transform: uppercase; }
+        select, input { padding: 10px; margin: 5px 0; width: 100%; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); }
+        .grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .xp-container { width: 100%; height: 10px; background: var(--border-color); border-radius: 5px; margin: 10px 0; overflow: hidden; }
+        .xp-bar { height: 100%; background: linear-gradient(90deg, var(--hfs-red), #ff4d4d); width: 0%; transition: width 0.5s; }
+        
+        .result-box { padding: 15px; border-radius: 12px; border-left: 5px solid var(--hfs-red); background: var(--hfs-light-red); margin-top: 10px; }
+        .calc-btn { background: var(--hfs-red); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        /* Dark Mode Switcher */
+        .theme-switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .theme-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--hfs-red); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .sidebar { order: 2; }
+            .main-content { order: 1; }
+        }
     </style>
 </head>
 <body>
@@ -82,236 +121,106 @@
     </div>
 </nav>
 
-<div class="container">
-    <div class="sidebar-logo">All Star Központ</div>
-
-    <div class="card">
-        <h3>Szintlépés Állapota</h3>
-        <label>Tag kiválasztása</label>
-        <select id="memberSelect" onchange="loadMemberData()">
-            <option value="custom">-- Egyéni pontbevitel --</option>
-        </select>
-        <div class="grid-row">
-            <div>
-                <label>Aktuális Divízió</label>
-                <select id="currentDivision" onchange="calculate()">
-                    <option>Newcomer</option>
-                    <option>Novice</option>
-                    <option>Intermediate</option>
-                    <option>Advanced</option>
-                </select>
-            </div>
-            <div>
-                <label>Jelenlegi pontok</label>
-                <input type="number" id="currentPoints" value="0" oninput="calculate()">
-            </div>
-        </div>
-        <div class="xp-container"><div id="xpBar" class="xp-bar"></div></div>
-        <div id="nextLevelResult" class="result-box"></div>
-    </div>
-
-    <div class="card">
-        <h3>Verseny Eredmény Naplózás</h3>
-        <div class="grid-row">
-            <div>
-                <label>Esemény</label>
-                <select id="compEvent"><option>Töltés...</option></select>
-            </div>
-            <div>
-                <label>Indulók (párok)</label>
-                <input type="number" id="competitorCount" placeholder="Pl. 35" oninput="calculateResults()">
-            </div>
+<div class="dashboard-grid">
+    <aside class="sidebar" id="sidebar">
+        <div class="card">
+            <h3>Következő Állomás</h3>
+            <div id="nextEventContent">Betöltés...</div>
         </div>
 
-        <div id="section-prelim" class="result-box section-green">
-            <label style="margin-top:0">1. Forduló: PRELIM</label>
-            <div class="grid-row" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
-                <div><label>Yes</label><input type="number" id="p_vYes" placeholder="0" oninput="calcPrelim('p')"></div>
-                <div><label>Alt1</label><input type="number" id="p_vAlt1" placeholder="0" oninput="calcPrelim('p')"></div>
-                <div><label>Alt2</label><input type="number" id="p_vAlt2" placeholder="0" oninput="calcPrelim('p')"></div>
-                <div><label>Alt3</label><input type="number" id="p_vAlt3" placeholder="0" oninput="calcPrelim('p')"></div>
+        <div class="card">
+            <h3>Tagok Szűrése</h3>
+            <div class="filter-group" id="memberFilter"></div>
+        </div>
+
+        <div class="card">
+            <h3>Aktivitás 2026</h3>
+            <div class="activity-chart" id="activityChart"></div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="card">
+            <h3>Szintlépés Állapota</h3>
+            <label>Tag kiválasztása</label>
+            <select id="memberSelect" onchange="loadMemberData()">
+                <option value="custom">-- Egyéni pontbevitel --</option>
+            </select>
+            <div class="grid-row">
+                <div>
+                    <label>Aktuális Divízió</label>
+                    <select id="currentDivision" onchange="calculate()">
+                        <option>Newcomer</option>
+                        <option>Novice</option>
+                        <option>Intermediate</option>
+                        <option>Advanced</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Jelenlegi pontok</label>
+                    <input type="number" id="currentPoints" value="0" oninput="calculate()">
+                </div>
             </div>
-            <p id="p_score" style="font-weight:bold; margin-top: 10px;">Pontszám: 0</p>
-            <label style="color:var(--text-color); font-size: 0.75em; cursor:pointer; display: flex; align-items: center; gap: 8px;">
-                <input type="checkbox" id="p_pass" onchange="toggleNextSection('semi')"> TOVÁBBJUTOTTAM A SEMI-BE
-            </label>
+            <div class="xp-container"><div id="xpBar" class="xp-bar"></div></div>
+            <div id="nextLevelResult" class="result-box"></div>
         </div>
 
-        <div id="section-semi" class="result-box section-green" style="display:none; border-left-color: #3498db; background: rgba(52, 152, 219, 0.05);">
-            <label style="margin-top:0">2. Forduló: SEMI</label>
-            <div class="grid-row" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
-                <div><label>Yes</label><input type="number" id="s_vYes" placeholder="0" oninput="calcPrelim('s')"></div>
-                <div><label>Alt1</label><input type="number" id="s_vAlt1" placeholder="0" oninput="calcPrelim('s')"></div>
-                <div><label>Alt2</label><input type="number" id="s_vAlt2" placeholder="0" oninput="calcPrelim('s')"></div>
-                <div><label>Alt3</label><input type="number" id="s_vAlt3" placeholder="0" oninput="calcPrelim('s')"></div>
+        <div class="card">
+            <h3>Verseny Eredmény Naplózás</h3>
+            <div class="grid-row">
+                <div>
+                    <label>Esemény</label>
+                    <select id="compEvent"><option>Válassz...</option></select>
+                </div>
+                <div>
+                    <label>Szerepkör (Role)</label>
+                    <select id="compRole">
+                        <option value="Leader">Leader</option>
+                        <option value="Follower">Follower</option>
+                    </select>
+                </div>
             </div>
-            <p id="s_score" style="font-weight:bold; margin-top: 10px;">Pontszám: 0</p>
-            <label style="color:var(--text-color); font-size: 0.75em; cursor:pointer; display: flex; align-items: center; gap: 8px;">
-                <input type="checkbox" id="s_pass" onchange="toggleNextSection('final')"> TOVÁBBJUTOTTAM A DÖNTŐBE
-            </label>
-        </div>
+            <div class="grid-row">
+                <div><label>Kategória Létszám</label><input type="number" id="roleParticipantCount"></div>
+                <div><label>Összes Induló</label><input type="number" id="competitorCount" oninput="calculateResults()"></div>
+            </div>
 
-        <div id="section-final" class="result-box section-gold" style="display:none;">
-            <label style="margin-top:0">3. Forduló: DÖNTŐ</label>
-            <label>Elért helyezés</label>
-            <input type="number" id="finalPlacement" placeholder="Pl. 1" min="1" max="20" oninput="calculateResults()">
-            <p id="finalStatusInfo" style="font-size: 0.85em; opacity: 0.8;"></p>
-        </div>
+            <div class="result-box" style="border-left-color:#2ecc40">
+                <label>1. Forduló: PRELIM</label>
+                <div class="grid-row">
+                    <input type="number" id="p_vYes" placeholder="Yes" oninput="calcPrelim('p')">
+                    <input type="number" id="p_vAlt1" placeholder="Alt1" oninput="calcPrelim('p')">
+                    <input type="number" id="p_vAlt2" placeholder="Alt2" oninput="calcPrelim('p')">
+                    <input type="number" id="p_vAlt3" placeholder="Alt3" oninput="calcPrelim('p')">
+                </div>
+                <p id="p_score" style="font-weight:bold; margin-top:10px;">Pontszám: 0</p>
+                <label><input type="checkbox" id="p_pass" onchange="toggleNextSection('semi')"> TOVÁBBJUTOTTAM A SEMI-BE</label>
+            </div>
 
-        <div id="finalResultDisplay" class="result-box" style="display:none;">
-            <p id="finalPlaceText" class="highlight" style="font-size: 1.2em; margin: 0;"></p>
-            <p id="wsdcPointsEarned" style="font-weight: bold; margin-top: 5px; color: #2ecc40;"></p>
+            <div id="section-semi" class="result-box" style="display:none; border-left-color:#3498db">
+                <label>2. Forduló: SEMI</label>
+                <div class="grid-row">
+                    <input type="number" id="s_vYes" placeholder="Yes" oninput="calcPrelim('s')">
+                    <input type="number" id="s_vAlt1" placeholder="Alt1" oninput="calcPrelim('s')">
+                </div>
+                <p id="s_score" style="font-weight:bold; margin-top:10px;">Pontszám: 0</p>
+                <label><input type="checkbox" id="s_pass" onchange="toggleNextSection('final')"> TOVÁBBJUTOTTAM A DÖNTŐBE</label>
+            </div>
+
+            <div id="section-final" class="result-box" style="display:none; border-left-color:#ffdc00">
+                <label>3. Forduló: DÖNTŐ</label>
+                <input type="number" id="finalPlacement" placeholder="Helyezés" oninput="calculateResults()">
+            </div>
+
+            <div id="finalResultDisplay" class="result-box" style="display:none;">
+                <p id="finalPlaceText" class="highlight"></p>
+                <p id="wsdcPointsEarned" style="font-weight:bold; color:#2ecc40;"></p>
+                <button class="calc-btn" style="background:#2ecc40" onclick="saveResultToExcel()">MENTÉS ADATBÁZISBA</button>
+            </div>
         </div>
-    </div>
+    </main>
 </div>
 
-<script>
-    const hfsStats = [
-        { name: "Ferenczi Csongor", div: "Intermediate", points: 19 },
-        { name: "Bende Márton", div: "Novice", points: 15 },
-        { name: "Angyal Mercédesz", div: "Novice", points: 4 },
-        { name: "Lázár Luca", div: "Novice", points: 0 },
-        { name: "Dominguez Zoltán", div: "Intermediate", points: 0 }
-    ];
-
-    const wsdcRules = {
-        "Newcomer": { allowed: 0, required: 1, next: "Novice" },
-        "Novice": { allowed: 16, required: 30, next: "Intermediate" },
-        "Intermediate": { allowed: 30, required: 45, next: "Advanced" },
-        "Advanced": { allowed: 60, required: 90, next: "All Star" }
-    };
-
-    const TIER_TABLE = {
-        1: [3, 2, 1], 
-        2: [6, 4, 3, 2, 1], 
-        3: [10, 8, 6, 4, 2, 1],
-        4: [15, 12, 10, 8, 6, 1], 
-        5: [20, 16, 14, 12, 10, 2], 
-        6: [25, 22, 18, 15, 12, 2]
-    };
-
-    function initDashboard() {
-        const sel = document.getElementById('memberSelect');
-        if (sel) hfsStats.forEach((m, i) => sel.add(new Option(m.name, i)));
-        
-        const isDark = localStorage.getItem('theme') === 'dark';
-        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-        const toggle = document.getElementById('theme-toggle');
-        if (toggle) {
-            toggle.checked = isDark;
-            toggle.onchange = (e) => {
-                const theme = e.target.checked ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-            };
-        }
-        calculate();
-    }
-
-    function loadMemberData() {
-        const idx = document.getElementById('memberSelect').value;
-        if(idx !== "custom") {
-            const m = hfsStats[idx];
-            document.getElementById('currentDivision').value = m.div;
-            document.getElementById('currentPoints').value = m.points;
-        }
-        calculate();
-    }
-
-    function calculate() {
-        const div = document.getElementById('currentDivision').value;
-        const pts = parseInt(document.getElementById('currentPoints').value) || 0;
-        const rule = wsdcRules[div];
-        if(!rule) return;
-        const percent = Math.min(100, (pts / rule.required) * 100);
-        document.getElementById('xpBar').style.width = percent + "%";
-        document.getElementById('nextLevelResult').innerHTML = `Következő: <strong>${rule.next}</strong> | Lehetséges: ${Math.max(0, rule.allowed - pts)} p | Kötelező: ${Math.max(0, rule.required - pts)} p`;
-    }
-
-    function toggleNextSection(type) {
-        if (type === 'semi') {
-            const isPassing = document.getElementById('p_pass').checked;
-            document.getElementById('section-semi').style.display = isPassing ? 'block' : 'none';
-        } else if (type === 'final') {
-            const isPassing = document.getElementById('s_pass').checked;
-            document.getElementById('section-final').style.display = isPassing ? 'block' : 'none';
-        }
-        calculateResults();
-    }
-
-    function calcPrelim(prefix) {
-        const y = parseInt(document.getElementById(`${prefix}_vYes`).value) || 0;
-        const a1 = parseInt(document.getElementById(`${prefix}_vAlt1`).value) || 0;
-        const a2 = parseInt(document.getElementById(`${prefix}_vAlt2`).value) || 0;
-        const a3 = parseInt(document.getElementById(`${prefix}_vAlt3`).value) || 0;
-        const score = (y * 10) + (a1 * 4.5) + (a2 * 4.3) + (a3 * 4.2);
-        document.getElementById(`${prefix}_score`).innerText = `Pontszám: ${score.toFixed(1)}`;
-    }
-
-    function getTier(count) {
-        if (count >= 130) return 6;
-        if (count >= 80) return 5;
-        if (count >= 40) return 4;
-        if (count >= 20) return 3;
-        if (count >= 11) return 2;
-        if (count >= 5) return 1;
-        return 0;
-    }
-
-    function calculateResults() {
-        const count = parseInt(document.getElementById('competitorCount').value) || 0;
-        const place = parseInt(document.getElementById('finalPlacement').value) || 0;
-        const tier = getTier(count);
-        const display = document.getElementById('finalResultDisplay');
-
-        if (place > 0 && tier > 0) {
-            const points = (TIER_TABLE[tier] && TIER_TABLE[tier][place - 1]) || 0;
-            display.style.display = 'block';
-            document.getElementById('finalPlaceText').innerText = `${place}. Helyezés (Tier ${tier})`;
-            document.getElementById('wsdcPointsEarned').innerText = `Szerzett WSDC pont: ${points}`;
-        } else {
-            display.style.display = 'none';
-        }
-    }
-    // Az Apps Script-től kapott URL-ed
-const DATABASE_URL = 'https://script.google.com/macros/s/AKfycbwzGZuGrFgNsreup8g9o--qOFXQbxFmu1ouuOwRNRTH0yk68VUV6PVXzzHZ-6VJK1jH/exec';
-
-async function saveResultToExcel() {
-    const memberIdx = document.getElementById('memberSelect').value;
-    const data = {
-        member: memberIdx === "custom" ? "Egyéni" : hfsStats[memberIdx].name,
-        event: document.getElementById('compEvent').value,
-        division: document.getElementById('currentDivision').value,
-        placement: document.getElementById('finalPlacement').value,
-        points: document.getElementById('wsdcPointsEarned').innerText.replace(/[^0-9]/g, '')
-    };
-
-    if (!data.event || !data.placement) {
-        alert("Kérlek válassz eseményt és írj be helyezést!");
-        return;
-    }
-
-    try {
-        const response = await fetch(DATABASE_URL, {
-            method: 'POST',
-            body: JSON.stringify(data)
-        });
-        alert("Eredmény sikeresen mentve az Excel adatbázisba! 🎉");
-    } catch (error) {
-        console.error("Hiba a mentéskor:", error);
-        alert("Hiba történt a mentés során.");
-    }
-}
-
-    window.onCalendarDataLoaded = () => {
-        const sel = document.getElementById('compEvent');
-        if (!sel || !allEvents) return;
-        sel.innerHTML = '<option disabled selected>Válassz...</option>';
-        [...new Set(allEvents.map(e => e.Event))].forEach(name => sel.add(new Option(name, name)));
-    };
-
-    window.addEventListener('DOMContentLoaded', initDashboard);
-</script>
 <script src="script.js"></script>
 </body>
 </html>
