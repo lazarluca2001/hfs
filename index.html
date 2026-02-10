@@ -273,6 +273,35 @@
             display.style.display = 'none';
         }
     }
+    // Az Apps Script-től kapott URL-ed
+const DATABASE_URL = 'https://script.google.com/macros/s/AKfycbwzGZuGrFgNsreup8g9o--qOFXQbxFmu1ouuOwRNRTH0yk68VUV6PVXzzHZ-6VJK1jH/exec';
+
+async function saveResultToExcel() {
+    const memberIdx = document.getElementById('memberSelect').value;
+    const data = {
+        member: memberIdx === "custom" ? "Egyéni" : hfsStats[memberIdx].name,
+        event: document.getElementById('compEvent').value,
+        division: document.getElementById('currentDivision').value,
+        placement: document.getElementById('finalPlacement').value,
+        points: document.getElementById('wsdcPointsEarned').innerText.replace(/[^0-9]/g, '')
+    };
+
+    if (!data.event || !data.placement) {
+        alert("Kérlek válassz eseményt és írj be helyezést!");
+        return;
+    }
+
+    try {
+        const response = await fetch(DATABASE_URL, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        alert("Eredmény sikeresen mentve az Excel adatbázisba! 🎉");
+    } catch (error) {
+        console.error("Hiba a mentéskor:", error);
+        alert("Hiba történt a mentés során.");
+    }
+}
 
     window.onCalendarDataLoaded = () => {
         const sel = document.getElementById('compEvent');
