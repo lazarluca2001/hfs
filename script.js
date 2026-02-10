@@ -9,21 +9,9 @@ const CONFIG = {
     weekdays: ["H","K","Sze","Cs","P","Szo","V"]
 };
 
-// WSDC Szabályrendszer adatai
-const WSDC_RULES = {
-    "Newcomer": { allowed: 0, required: 1, next: "Novice" },
-    "Novice": { allowed: 16, required: 30, next: "Intermediate" },
-    "Intermediate": { allowed: 30, required: 45, next: "Advanced" },
-    "Advanced": { allowed: 60, required: 90, next: "All Star" }
-};
-
 const TIER_TABLE = {
-    1: [3, 2, 1], 
-    2: [6, 4, 3, 2, 1], 
-    3: [10, 8, 6, 4, 2, 1],
-    4: [15, 12, 10, 8, 6, 1], 
-    5: [20, 16, 14, 12, 10, 2], 
-    6: [25, 22, 18, 15, 12, 2]
+    1: [3, 2, 1], 2: [6, 4, 3, 2, 1], 3: [10, 8, 6, 4, 2, 1],
+    4: [15, 12, 10, 8, 6, 1], 5: [20, 16, 14, 12, 10, 2], 6: [25, 22, 18, 15, 12, 2]
 };
 
 let allEvents = [];
@@ -41,7 +29,7 @@ const parseDate = (d) => {
     return dt && !isNaN(dt) ? dt.setHours(0, 0, 0, 0) : null;
 };
 
-/* --- NAPTÁR ADATOK BETÖLTÉSE --- */
+/* --- ADATOK BETÖLTÉSE --- */
 async function initCalendar() {
     try {
         const res = await fetch(CONFIG.url);
@@ -67,18 +55,20 @@ async function initCalendar() {
             })
             .filter(e => e._startTs);
 
-        // UI frissítése, ha naptár oldalon vagyunk
+        // NAPTÁR OLDAL FUNKCIÓI
         if (document.getElementById('calendar')) {
             renderFilter();
             setupMonthSelect();
             updateUI();
         }
         
-        // Dropdown feltöltése, ha index oldalon vagyunk
-        populateEventDropdown();
+        // INDEX OLDAL FUNKCIÓI
+        if (document.getElementById('compEvent')) {
+            populateEventDropdown();
+        }
 
     } catch (e) {
-        console.error("Hiba az adatok betöltésekor:", e);
+        console.error("Betöltési hiba:", e);
     }
 }
 
@@ -93,8 +83,8 @@ function render(m) {
     const cal = document.getElementById('calendar');
     if (!cal) return;
     
-    const fragment = document.createDocumentFragment();
     cal.innerHTML = '';
+    const fragment = document.createDocumentFragment();
     const monthHeader = document.getElementById('currentMonthHeader');
     if (monthHeader) monthHeader.innerText = CONFIG.months[m];
 
@@ -147,23 +137,17 @@ function render(m) {
     cal.appendChild(fragment);
 }
 
-/* --- STATISZTIKA ÉS KERESŐ --- */
+/* --- STATISZTIKA --- */
 function updateActivityChart() {
     const container = document.getElementById('activityChart');
     if (!container) return;
-
     container.innerHTML = Object.entries(CONFIG.members).map(([name, emoji]) => {
         const count = allEvents.filter(e => {
             const s = (e[name] || "").toLowerCase();
             return CONFIG.validStatuses.some(vs => s.includes(vs));
         }).length;
         const height = allEvents.length ? (count / allEvents.length) * 80 : 0;
-        return `
-            <div class="chart-column-wrapper">
-                <span class="chart-emoji">${emoji}</span>
-                <div class="chart-bar" style="height:${height}px"></div>
-                <span class="chart-label">${count}</span>
-            </div>`;
+        return `<div class="chart-column-wrapper"><span class="chart-emoji">${emoji}</span><div class="chart-bar" style="height:${height}px"></div><span class="chart-label">${count}</span></div>`;
     }).join('');
 }
 
@@ -172,45 +156,55 @@ function updateNext() {
     if (!box) return;
     const now = new Date().setHours(0, 0, 0, 0);
     const next = allEvents.filter(e => e._endTs >= now).sort((a, b) => a._startTs - b._startTs)[0];
-
     if (next) {
         const diff = Math.round((next._startTs - now) / 86400000);
-        const dayText = diff > 0 ? `Még ${diff} nap` : (diff === 0 ? "Ma kezdődik! 🔥" : "Folyamatban...");
-        box.innerHTML = `<div class="next-event-title">${next.Event}</div><div class="next-event-countdown">${dayText}</div>`;
+        box.innerHTML = `<div class="next-event-title">${next.Event}</div><div class="next-event-countdown">${diff > 0 ? 'Még ' + diff + ' nap' : 'Ma kezdődik! 🔥'}</div>`;
     }
 }
 
-/* --- INDEX OLDAL - KALKULÁTOR FUNKCIÓK --- */
-function populateEventDropdown() {
-    const sel = document.getElementById('compEvent');
-    if (!sel || allEvents.length === 0) return;
-    sel.innerHTML = '<option disabled selected>Válassz...</option>';
-    [...new Set(allEvents.map(e => e.Event))].forEach(name => sel.add(new Option(name, name)));
+/* --- INDEX OLDAL - KOMPLEX KALKULÁTOR --- */
 
-    sel.onchange = (e) => {
-        const ev = allEvents.find(event => event.Event === e.target.value);
-        if (ev && ev._startTs) {
-            const d = new Date(ev._startTs);
-            const diff = (d.getDay() <= 6) ? (6 - d.getDay()) : 0; // Szombat keresése
-            d.setDate(d.getDate() + diff);
-            document.getElementById('compDate').value = d.toISOString().split('T')[0];
+function toggleNextSection(type) {
+    if (type === 'semi') {
+        const isPassing = document.getElementById('p_pass').checked;
+        document.getElementById('section-semi').style.display = isPassing ? 'block' : 'none';
+        if (!isPassing) {
+            document.getElementById('s_pass').checked = false;
+            toggleNextSection('final');
         }
-    };
+    } else if (type === 'final') {
+        const isPassing = document.getElementById('s_pass').checked;
+        document.getElementById('section-final').style.display = isPassing ? 'block' : 'none';
+        if (isPassing) generateJudgeInputs();
+    }
 }
 
-// Relative Placement Algoritmus
+function calcPrelim(prefix) {
+    const y = parseInt(document.getElementById(`${prefix}_vYes`).value) || 0;
+    const a1 = parseInt(document.getElementById(`${prefix}_vAlt1`).value) || 0;
+    const score = (y * 10) + (a1 * 7);
+    document.getElementById(`${prefix}_score`).innerText = `Pontszám: ${score}`;
+}
+
+function generateJudgeInputs() {
+    const count = document.getElementById('finalJudgeCount').value;
+    const container = document.getElementById('judgeInputsContainer');
+    if(!container) return;
+    container.innerHTML = '';
+    for (let i = 1; i <= count; i++) {
+        container.innerHTML += `<input type="number" class="rp-input" placeholder="J${i}" style="width:50px; margin:2px;">`;
+    }
+}
+
 function runRelativePlacement() {
     const inputs = document.querySelectorAll('.rp-input');
     const scores = Array.from(inputs).map(i => parseInt(i.value)).filter(v => !isNaN(v));
-    if (scores.length < 3) return alert("Bírói helyezések szükségesek!");
+    if (scores.length < 3) return alert("Kérlek add meg a bírói helyezéseket!");
 
     const majority = Math.ceil(scores.length / 2);
     let finalPlace = 0;
-
-    // Relative Placement Rule Logic
     for (let p = 1; p <= 20; p++) {
-        const count = scores.filter(s => s <= p).length;
-        if (count >= majority) {
+        if (scores.filter(s => s <= p).length >= majority) {
             finalPlace = p;
             break;
         }
@@ -218,25 +212,40 @@ function runRelativePlacement() {
 
     const count = parseInt(document.getElementById('competitorCount').value) || 0;
     let tier = 0;
-    if(count >= 130) tier = 6; else if(count >= 80) tier = 5; else if(count >= 40) tier = 4;
-    else if(count >= 20) tier = 3; else if(count >= 11) tier = 2; else if(count >= 5) tier = 1;
+    if (count >= 130) tier = 6; else if (count >= 80) tier = 5; else if (count >= 40) tier = 4;
+    else if (count >= 20) tier = 3; else if (count >= 11) tier = 2; else if (count >= 5) tier = 1;
 
     const points = (TIER_TABLE[tier] && TIER_TABLE[tier][finalPlace - 1]) || 0;
-
     document.getElementById('finalResultDisplay').style.display = 'block';
     document.getElementById('finalPlaceText').innerText = `Helyezés: ${finalPlace}.`;
     document.getElementById('wsdcPointsEarned').innerText = `Szerzett WSDC pont: ${points}`;
 }
 
-/* --- INIT & ESEMÉNYKEZELŐK --- */
+function populateEventDropdown() {
+    const sel = document.getElementById('compEvent');
+    if (!sel || allEvents.length === 0) return;
+    sel.innerHTML = '<option disabled selected>Válassz...</option>';
+    [...new Set(allEvents.map(e => e.Event))].forEach(name => sel.add(new Option(name, name)));
+    sel.onchange = (e) => {
+        const ev = allEvents.find(event => event.Event === e.target.value);
+        if (ev && ev._startTs) {
+            const d = new Date(ev._startTs);
+            const diff = (d.getDay() <= 6) ? (6 - d.getDay()) : 0;
+            d.setDate(d.getDate() + diff);
+            document.getElementById('compDate').value = d.toISOString().split('T')[0];
+        }
+    };
+}
+
+/* --- INIT --- */
 document.addEventListener('DOMContentLoaded', () => {
     initCalendar();
     
-    // Téma kezelés
+    // Téma kapcsoló inicializálása mindkét oldalon
     const themeToggle = document.getElementById('theme-toggle') || document.getElementById('checkbox');
-    const isDark = localStorage.getItem('theme') === 'dark';
-    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
     if(themeToggle) {
+        const isDark = localStorage.getItem('theme') === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
         themeToggle.checked = isDark;
         themeToggle.onchange = () => {
             const t = themeToggle.checked ? 'dark' : 'light';
@@ -244,6 +253,11 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('theme', t);
         };
     }
+
+    // Sidebar toggle (mobilhoz)
+    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        document.getElementById('sidebar')?.classList.toggle('open');
+    });
 });
 
 function setupMonthSelect() {
