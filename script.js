@@ -1,7 +1,9 @@
 /* jshint esversion: 11 */
 
+/* --- KONFIGURÁCIÓ & ADATOK --- */
 const CONFIG = {
     url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSDDBNbIkZize7hPMfYPovbLgnIFWNuseLg0mjzDYGhLCwEEiF_-CiXnV76lgg2mvb54QabZ8y3Sork/pub?gid=338581218&single=true&output=csv',
+    databaseAppUrl: 'IDE_MÁSOLD_A_SCRIPT_DEPLOY_URL_ED',
     members: {"Csongi":"🌈","Merci":"🦆","Mózes":"🦄","Luca":"🐶","Zoli":"🕺"},
     validStatuses: ["igen", "talán", "talan", "fizetve", "igazolt"],
     months: ["JANUÁR","FEBRUÁR","MÁRCIUS","ÁPRILIS","MÁJUS","JÚNIUS","JÚLIUS","AUGUSZTUS","SZEPTEMBER","OKTÓBER","NOVEMBER","DECEMBER"],
@@ -57,21 +59,118 @@ async function initCalendar() {
             })
             .filter(e => e._startTs);
 
-        updateDashboardUI();
-    } catch (e) { console.error("Hiba:", e); }
+        updateUI();
+    } catch (e) { 
+        console.error("Adatbetöltési hiba:", e); 
+    }
 }
 
-/* --- DASHBOARD UI FUNKCIÓK --- */
-function updateDashboardUI() {
+/* --- UI FRISSÍTÉS --- */
+function updateUI() {
+    if (document.getElementById('calendar')) {
+        renderCalendar(currentMonthIdx);
+        setupMonthSelect();
+    }
     renderFilter();
     updateActivityChart();
     updateNextCountdown();
     populateEventDropdown();
-    
-    // Ha van naptár elem, akkor azt is rendereljük
-    if (document.getElementById('calendar')) renderCalendar(currentMonthIdx);
 }
 
+/* --- NAPTÁR GENERÁLÁSA --- */
+function renderCalendar(m) {
+    const cal = document.getElementById('calendar');
+    if (!cal) return;
+    
+    cal.innerHTML = '';
+    const fragment = document.createDocumentFragment();
+    
+    // Hónap név frissítése
+    const monthHeader = document.getElementById('currentMonthHeader');
+    if (monthHeader) monthHeader.innerText = CONFIG.months[m];
+
+    // Hét napjai fejléc
+    CONFIG.weekdays.forEach(d => {
+        const div = document.createElement('div');
+        div.className = 'weekday';
+        div.textContent = d;
+        fragment.appendChild(div);
+    });
+
+    // Hónap első napja és hossza
+    const firstDay = (new Date(2026, m, 1).getDay() + 6) % 7;
+    const daysInMonth = new Date(2026, m + 1, 0).getDate();
+    const todayTs = new Date().setHours(0, 0, 0, 0);
+
+    // Üres napok a hónap előtt
+    for (let i = 0; i < firstDay; i++) {
+        const div = document.createElement('div');
+        div.className = 'day empty-day-pre';
+        fragment.appendChild(div);
+    }
+
+    // Napok feltöltése
+    for (let d = 1; d <= daysInMonth; d++) {
+        const currTs = new Date(2026, m, d).setHours(0, 0, 0, 0);
+        const dayEvents = allEvents.filter(e => currTs >= e._startTs && currTs <= e._endTs);
+
+        const dayDiv = document.createElement('div');
+        dayDiv.className = `day ${todayTs === currTs ? 'today' : ''}`;
+        dayDiv.innerHTML = `<span class="day-number">${d}</span>`;
+
+        dayEvents.forEach(e => {
+            let tagsHtml = "";
+            Object.entries(CONFIG.members).forEach(([name, emoji]) => {
+                const status = (e[name] || "").toLowerCase();
+                if (CONFIG.validStatuses.some(vs => status.includes(vs))) {
+                    if (!activeFilter || activeFilter === name) {
+                        const isTalan = status.includes("talan") || status.includes("talán");
+                        tagsHtml += `<div class="person-tag ${isTalan ? 'status-talan' : 'status-biztos'}"><span>${emoji}</span></div>`;
+                    }
+                }
+            });
+
+            if (tagsHtml || !activeFilter) {
+                const card = document.createElement('div');
+                card.className = 'event-card';
+                card.innerHTML = `
+                    <span class="event-title">${e.Event}</span>
+                    <div class="participants-container">${tagsHtml}</div>
+                `;
+                dayDiv.appendChild(card);
+            }
+        });
+        fragment.appendChild(dayDiv);
+    }
+    cal.appendChild(fragment);
+}
+
+/* --- NAPTÁR NAVIGÁCIÓ --- */
+function setupMonthSelect() {
+    const sel = document.getElementById('monthSelect');
+    if (!sel) return;
+    sel.innerHTML = CONFIG.months.map((m, i) => `<option value="${i}" ${i === currentMonthIdx ? 'selected' : ''}>${m}</option>`).join('');
+    sel.onchange = e => { 
+        currentMonthIdx = parseInt(e.target.value, 10); 
+        renderCalendar(currentMonthIdx); 
+    };
+}
+
+window.changeMonth = (d) => {
+    currentMonthIdx = (currentMonthIdx + d + 12) % 12;
+    renderCalendar(currentMonthIdx);
+    const sel = document.getElementById('monthSelect');
+    if (sel) sel.value = currentMonthIdx;
+};
+
+window.goToToday = () => {
+    currentMonthIdx = new Date().getMonth();
+    renderCalendar(currentMonthIdx);
+    const sel = document.getElementById('monthSelect');
+    if (sel) sel.value = currentMonthIdx;
+};
+
+/* --- STATISZTIKÁK ÉS SZŰRŐK --- */
 function renderFilter() {
     const box = document.getElementById('memberFilter');
     if (!box) return;
@@ -84,7 +183,7 @@ function renderFilter() {
 
 window.toggleFilter = (name) => {
     activeFilter = activeFilter === name ? null : name;
-    updateDashboardUI();
+    updateUI();
 };
 
 function updateActivityChart() {
@@ -96,7 +195,7 @@ function updateActivityChart() {
             const s = (e[name] || "").toLowerCase();
             return CONFIG.validStatuses.some(vs => s.includes(vs));
         }).length;
-        const height = Math.min(80, (count / 20) * 80); // 20 esemény a 100%
+        const height = Math.min(80, (count / 20) * 80);
         return `
             <div class="chart-column-wrapper">
                 <div class="chart-bar" style="height:${height}px"></div>
@@ -118,6 +217,7 @@ function updateNextCountdown() {
     }
 }
 
+/* --- KALKULÁTOR ÉS ADATBÁZIS --- */
 function populateEventDropdown() {
     const sel = document.getElementById('compEvent');
     if (!sel) return;
@@ -125,39 +225,14 @@ function populateEventDropdown() {
     [...new Set(allEvents.map(e => e.Event))].sort().forEach(name => sel.add(new Option(name, name)));
 }
 
-/* --- KALKULÁTOR LOGIKA --- */
-window.loadMemberData = () => {
-    const idx = document.getElementById('memberSelect').value;
-    if(idx !== "custom") {
-        const m = hfsStats[idx];
-        document.getElementById('currentDivision').value = m.div;
-        document.getElementById('currentPoints').value = m.points;
-    }
-    calculate();
-};
-
-window.calculate = () => {
-    const div = document.getElementById('currentDivision').value;
-    const pts = parseInt(document.getElementById('currentPoints').value) || 0;
-    const rule = { "Newcomer": 1, "Novice": 30, "Intermediate": 45, "Advanced": 90 }[div];
-    
-    const percent = Math.min(100, (pts / rule) * 100);
-    document.getElementById('xpBar').style.width = percent + "%";
-    document.getElementById('nextLevelResult').innerHTML = `Muszáj: <strong>${Math.max(0, rule - pts)}</strong> pont múlva szintlépés.`;
-};
-
 window.calcPrelim = (prefix) => {
     const y = parseInt(document.getElementById(`${prefix}_vYes`).value) || 0;
     const a1 = parseInt(document.getElementById(`${prefix}_vAlt1`).value) || 0;
     const a2 = parseInt(document.getElementById(`${prefix}_vAlt2`).value) || 0;
     const a3 = parseInt(document.getElementById(`${prefix}_vAlt3`).value) || 0;
     const score = (y * 10) + (a1 * 4.5) + (a2 * 4.3) + (a3 * 4.2);
-    document.getElementById(`${prefix}_score`).innerText = `Pontszám: ${score.toFixed(1)}`;
-};
-
-window.toggleNextSection = (type) => {
-    const isPass = document.getElementById(type === 'semi' ? 'p_pass' : 's_pass').checked;
-    document.getElementById(`section-${type}`).style.display = isPass ? 'block' : 'none';
+    const scoreElem = document.getElementById(`${prefix}_score`);
+    if (scoreElem) scoreElem.innerText = `Pontszám: ${score.toFixed(1)}`;
 };
 
 window.calculateResults = () => {
@@ -169,18 +244,22 @@ window.calculateResults = () => {
 
     const points = (TIER_TABLE[tier] && TIER_TABLE[tier][place - 1]) || 0;
     const display = document.getElementById('finalResultDisplay');
-    display.style.display = place > 0 ? 'block' : 'none';
-    document.getElementById('finalPlaceText').innerText = `${place}. Helyezés (Tier ${tier})`;
-    document.getElementById('wsdcPointsEarned').innerText = `Szerzett WSDC pont: ${points}`;
+    if (display) {
+        display.style.display = place > 0 ? 'block' : 'none';
+        document.getElementById('finalPlaceText').innerText = `${place}. Helyezés (Tier ${tier})`;
+        document.getElementById('wsdcPointsEarned').innerText = `Szerzett WSDC pont: ${points}`;
+    }
 };
 
-/* --- TÉMA ÉS INIT --- */
+/* --- TÉMA ÉS INICIALIZÁLÁS --- */
 document.addEventListener('DOMContentLoaded', () => {
     initCalendar();
     
-    const sel = document.getElementById('memberSelect');
-    if(sel) hfsStats.forEach((m, i) => sel.add(new Option(m.name, i)));
+    // Member select feltöltése a kalkulátorhoz
+    const mSel = document.getElementById('memberSelect');
+    if(mSel) hfsStats.forEach((m, i) => mSel.add(new Option(m.name, i)));
 
+    // Sötét mód kezelése
     const themeToggle = document.getElementById('theme-toggle');
     const isDark = localStorage.getItem('theme') === 'dark';
     document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
