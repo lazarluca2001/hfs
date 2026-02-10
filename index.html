@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HFS Master Dashboard | All Star Központ</title>
     <style>
-        /* --- GLOBÁLIS STÍLUSOK --- */
+        /* --- GLOBÁLIS STÍLUSOK ÉS VÁLTOZÓK --- */
         :root {
             --hfs-red: #800000;
             --hfs-red-hover: #a00000;
@@ -55,7 +55,6 @@
         select, input { padding: 12px; margin: 8px 0; width: 100%; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1em; }
         .grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
-        /* XP Csík Stílus */
         .xp-container { width: 100%; height: 12px; background: var(--border-color); border-radius: 6px; margin-top: 10px; overflow: hidden; position: relative; }
         .xp-bar { height: 100%; background: linear-gradient(90deg, var(--hfs-red), #ff4d4d); width: 0%; transition: width 0.5s ease; }
 
@@ -65,16 +64,6 @@
         
         .highlight { font-weight: 800; color: var(--hfs-red); }
         .calc-btn { background: var(--hfs-red); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-
-        .judge-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .rp-input { width: 55px !important; text-align: center; padding: 8px !important; }
-
-        .theme-switch { position: relative; display: inline-block; width: 40px; height: 20px; }
-        .theme-switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--hfs-red); }
-        input:checked + .slider:before { transform: translateX(20px); }
     </style>
 </head>
 <body>
@@ -130,49 +119,48 @@
             </div>
             <div>
                 <label>Indulók (párok)</label>
-                <input type="number" id="competitorCount" placeholder="Pl. 35" oninput="updateTierInfo()">
+                <input type="number" id="competitorCount" placeholder="Pl. 35" oninput="calculateResults()">
             </div>
         </div>
 
         <div id="section-prelim" class="result-box section-green">
-    <label style="margin-top:0">1. Forduló: PRELIM</label>
-    <div class="grid-row" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
-        <div><label>Yes</label><input type="number" id="p_vYes" placeholder="0" oninput="calcPrelim('p')"></div>
-        <div><label>Alt1</label><input type="number" id="p_vAlt1" placeholder="0" oninput="calcPrelim('p')"></div>
-        <div><label>Alt2</label><input type="number" id="p_vAlt2" placeholder="0" oninput="calcPrelim('p')"></div>
-        <div><label>Alt3</label><input type="number" id="p_vAlt3" placeholder="0" oninput="calcPrelim('p')"></div>
-    </div>
-    <p id="p_score" style="font-weight:bold; margin-top: 10px;">Pontszám: 0</p>
-    <label style="color:var(--text-color); font-size: 0.75em; cursor:pointer; display: flex; align-items: center; gap: 8px;">
-        <input type="checkbox" id="p_pass" onchange="toggleNextSection('semi')"> TOVÁBBJUTOTTAM A SEMI-BE
-    </label>
-</div>
+            <label style="margin-top:0">1. Forduló: PRELIM</label>
+            <div class="grid-row" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
+                <div><label>Yes</label><input type="number" id="p_vYes" placeholder="0" oninput="calcPrelim('p')"></div>
+                <div><label>Alt1</label><input type="number" id="p_vAlt1" placeholder="0" oninput="calcPrelim('p')"></div>
+                <div><label>Alt2</label><input type="number" id="p_vAlt2" placeholder="0" oninput="calcPrelim('p')"></div>
+                <div><label>Alt3</label><input type="number" id="p_vAlt3" placeholder="0" oninput="calcPrelim('p')"></div>
+            </div>
+            <p id="p_score" style="font-weight:bold; margin-top: 10px;">Pontszám: 0</p>
+            <label style="color:var(--text-color); font-size: 0.75em; cursor:pointer; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="p_pass" onchange="toggleNextSection('semi')"> TOVÁBBJUTOTTAM A SEMI-BE
+            </label>
+        </div>
 
-<div id="section-semi" class="result-box section-green" style="display:none; border-left-color: #3498db; background: rgba(52, 152, 219, 0.05);">
-    <label style="margin-top:0">2. Forduló: SEMI</label>
-    <div class="grid-row" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
-        <div><label>Yes</label><input type="number" id="s_vYes" placeholder="0" oninput="calcPrelim('s')"></div>
-        <div><label>Alt1</label><input type="number" id="s_vAlt1" placeholder="0" oninput="calcPrelim('s')"></div>
-        <div><label>Alt2</label><input type="number" id="s_vAlt2" placeholder="0" oninput="calcPrelim('s')"></div>
-        <div><label>Alt3</label><input type="number" id="s_vAlt3" placeholder="0" oninput="calcPrelim('s')"></div>
-    </div>
-    <p id="s_score" style="font-weight:bold; margin-top: 10px;">Pontszám: 0</p>
-    <label style="color:var(--text-color); font-size: 0.75em; cursor:pointer; display: flex; align-items: center; gap: 8px;">
-        <input type="checkbox" id="s_pass" onchange="toggleNextSection('final')"> TOVÁBBJUTOTTAM A DÖNTŐBE
-    </label>
-</div>
+        <div id="section-semi" class="result-box section-green" style="display:none; border-left-color: #3498db; background: rgba(52, 152, 219, 0.05);">
+            <label style="margin-top:0">2. Forduló: SEMI</label>
+            <div class="grid-row" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
+                <div><label>Yes</label><input type="number" id="s_vYes" placeholder="0" oninput="calcPrelim('s')"></div>
+                <div><label>Alt1</label><input type="number" id="s_vAlt1" placeholder="0" oninput="calcPrelim('s')"></div>
+                <div><label>Alt2</label><input type="number" id="s_vAlt2" placeholder="0" oninput="calcPrelim('s')"></div>
+                <div><label>Alt3</label><input type="number" id="s_vAlt3" placeholder="0" oninput="calcPrelim('s')"></div>
+            </div>
+            <p id="s_score" style="font-weight:bold; margin-top: 10px;">Pontszám: 0</p>
+            <label style="color:var(--text-color); font-size: 0.75em; cursor:pointer; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="s_pass" onchange="toggleNextSection('final')"> TOVÁBBJUTOTTAM A DÖNTŐBE
+            </label>
+        </div>
 
         <div id="section-final" class="result-box section-gold" style="display:none;">
-            <label>3. Forduló: DÖNTŐ</label>
-            <label>Bírók száma</label>
-            <input type="number" id="finalJudgeCount" value="5" min="3" step="2" oninput="generateJudgeInputs()">
-            <div id="judgeInputsContainer" class="judge-grid"></div>
-            <button class="calc-btn" onclick="runRelativePlacement()">Helyezés Számítása</button>
+            <label style="margin-top:0">3. Forduló: DÖNTŐ</label>
+            <label>Elért helyezés</label>
+            <input type="number" id="finalPlacement" placeholder="Pl. 1" min="1" max="20" oninput="calculateResults()">
+            <p id="finalStatusInfo" style="font-size: 0.85em; opacity: 0.8;"></p>
         </div>
 
         <div id="finalResultDisplay" class="result-box" style="display:none;">
-            <p id="finalPlaceText" class="highlight"></p>
-            <p id="wsdcPointsEarned"></p>
+            <p id="finalPlaceText" class="highlight" style="font-size: 1.2em; margin: 0;"></p>
+            <p id="wsdcPointsEarned" style="font-weight: bold; margin-top: 5px; color: #2ecc40;"></p>
         </div>
     </div>
 </div>
@@ -194,15 +182,18 @@
     };
 
     const TIER_TABLE = {
-        1: [3, 2, 1], 2: [6, 4, 3, 2, 1], 3: [10, 8, 6, 4, 2, 1],
-        4: [15, 12, 10, 8, 6, 1], 5: [20, 16, 14, 12, 10, 2], 6: [25, 22, 18, 15, 12, 2]
+        1: [3, 2, 1], 
+        2: [6, 4, 3, 2, 1], 
+        3: [10, 8, 6, 4, 2, 1],
+        4: [15, 12, 10, 8, 6, 1], 
+        5: [20, 16, 14, 12, 10, 2], 
+        6: [25, 22, 18, 15, 12, 2]
     };
 
     function initDashboard() {
         const sel = document.getElementById('memberSelect');
         if (sel) hfsStats.forEach((m, i) => sel.add(new Option(m.name, i)));
         
-        // Téma inicializálás
         const isDark = localStorage.getItem('theme') === 'dark';
         document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
         const toggle = document.getElementById('theme-toggle');
@@ -232,30 +223,10 @@
         const pts = parseInt(document.getElementById('currentPoints').value) || 0;
         const rule = wsdcRules[div];
         if(!rule) return;
-
-        let aDiff = Math.max(0, rule.allowed - pts);
-        let rDiff = Math.max(0, rule.required - pts);
-        
-        // XP sáv frissítése
-        const percent = Math.min(100, (pts / rule.allowed) * 100);
+        const percent = Math.min(100, (pts / rule.required) * 100);
         document.getElementById('xpBar').style.width = percent + "%";
-
-        document.getElementById('nextLevelResult').innerHTML = `Következő: <strong>${rule.next}</strong> | Lehetséges: ${aDiff} p | Kötelező: ${rDiff} p`;
+        document.getElementById('nextLevelResult').innerHTML = `Következő: <strong>${rule.next}</strong> | Lehetséges: ${Math.max(0, rule.allowed - pts)} p | Kötelező: ${Math.max(0, rule.required - pts)} p`;
     }
-
-    // A script.js betöltése után hívjuk meg ezt, hogy az Event dropdown feltöltődjön
-    function populateEventDropdown() {
-        const sel = document.getElementById('compEvent');
-        if (!sel || !allEvents || allEvents.length === 0) return;
-        
-        sel.innerHTML = '<option disabled selected>Válassz...</option>';
-        [...new Set(allEvents.map(e => e.Event))].forEach(name => sel.add(new Option(name, name)));
-    }
-
-    // A naptár adatkezelője hívja majd meg ezt, ha kész a betöltés
-    window.onCalendarDataLoaded = () => {
-        populateEventDropdown();
-    };
 
     function toggleNextSection(type) {
         if (type === 'semi') {
@@ -264,54 +235,54 @@
         } else if (type === 'final') {
             const isPassing = document.getElementById('s_pass').checked;
             document.getElementById('section-final').style.display = isPassing ? 'block' : 'none';
-            if (isPassing) generateJudgeInputs();
         }
+        calculateResults();
     }
 
     function calcPrelim(prefix) {
         const y = parseInt(document.getElementById(`${prefix}_vYes`).value) || 0;
         const a1 = parseInt(document.getElementById(`${prefix}_vAlt1`).value) || 0;
-        const score = (y * 10) + (a1 * 4.5);
-        document.getElementById(`${prefix}_score`).innerText = `Pontszám: ${score}`;
+        const a2 = parseInt(document.getElementById(`${prefix}_vAlt2`).value) || 0;
+        const a3 = parseInt(document.getElementById(`${prefix}_vAlt3`).value) || 0;
+        const score = (y * 10) + (a1 * 4.5) + (a2 * 4.3) + (a3 * 4.2);
+        document.getElementById(`${prefix}_score`).innerText = `Pontszám: ${score.toFixed(1)}`;
     }
 
-    function generateJudgeInputs() {
-        const count = document.getElementById('finalJudgeCount').value;
-        const container = document.getElementById('judgeInputsContainer');
-        container.innerHTML = '';
-        for (let i = 1; i <= count; i++) {
-            container.innerHTML += `<input type="number" class="rp-input" placeholder="J${i}">`;
-        }
+    function getTier(count) {
+        if (count >= 130) return 6;
+        if (count >= 80) return 5;
+        if (count >= 40) return 4;
+        if (count >= 20) return 3;
+        if (count >= 11) return 2;
+        if (count >= 5) return 1;
+        return 0;
     }
 
-    function runRelativePlacement() {
-        const inputs = document.querySelectorAll('.rp-input');
-        const scores = Array.from(inputs).map(i => parseInt(i.value)).filter(v => !isNaN(v));
-        if (scores.length < 3) return alert("Kérlek adj meg legalább 3 bírói helyezést!");
-
-        const majority = Math.ceil(scores.length / 2);
-        let finalPlace = 0;
-        for (let p = 1; p <= 20; p++) {
-            if (scores.filter(s => s <= p).length >= majority) {
-                finalPlace = p;
-                break;
-            }
-        }
-
+    function calculateResults() {
         const count = parseInt(document.getElementById('competitorCount').value) || 0;
-        let tier = 0;
-        if (count >= 130) tier = 6; else if (count >= 80) tier = 5; else if (count >= 40) tier = 4;
-        else if (count >= 20) tier = 3; else if (count >= 11) tier = 2; else if (count >= 5) tier = 1;
+        const place = parseInt(document.getElementById('finalPlacement').value) || 0;
+        const tier = getTier(count);
+        const display = document.getElementById('finalResultDisplay');
 
-        const points = (TIER_TABLE[tier] && TIER_TABLE[tier][finalPlace - 1]) || 0;
-        document.getElementById('finalResultDisplay').style.display = 'block';
-        document.getElementById('finalPlaceText').innerText = `Helyezés: ${finalPlace}.`;
-        document.getElementById('wsdcPointsEarned').innerText = `Szerzett WSDC pont: ${points} (Tier ${tier})`;
+        if (place > 0 && tier > 0) {
+            const points = (TIER_TABLE[tier] && TIER_TABLE[tier][place - 1]) || 0;
+            display.style.display = 'block';
+            document.getElementById('finalPlaceText').innerText = `${place}. Helyezés (Tier ${tier})`;
+            document.getElementById('wsdcPointsEarned').innerText = `Szerzett WSDC pont: ${points}`;
+        } else {
+            display.style.display = 'none';
+        }
     }
+
+    window.onCalendarDataLoaded = () => {
+        const sel = document.getElementById('compEvent');
+        if (!sel || !allEvents) return;
+        sel.innerHTML = '<option disabled selected>Válassz...</option>';
+        [...new Set(allEvents.map(e => e.Event))].forEach(name => sel.add(new Option(name, name)));
+    };
 
     window.addEventListener('DOMContentLoaded', initDashboard);
 </script>
-
 <script src="script.js"></script>
 </body>
 </html>
